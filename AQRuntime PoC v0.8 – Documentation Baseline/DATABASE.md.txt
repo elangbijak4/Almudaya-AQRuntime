@@ -1,0 +1,14 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v0.8
+
+---
+
+# 1. Configuration & UI Assets
+
+- Config File: `config/runtime.yaml` (`runtime_version: "0.8.0"`)
+- UI Asset File: `src/aqruntime/server/ui/index.html`
+- Memory Storage: `memory/<session_name>.json`
+- Model Directory: `models/<sanitized_repo_name>/`

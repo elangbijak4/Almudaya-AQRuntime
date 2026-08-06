@@ -1,0 +1,14 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v0.4
+
+---
+
+# 1. Implementation Architecture
+
+- `src/aqruntime/config/settings.py`: Added `hf_token` to `RuntimeSettings` and implemented `save_token`.
+- `src/aqruntime/model/manager.py`: Token resolution in `ModelManager.download` and Gated model error catching.
+- `src/aqruntime/catalog/manager.py`: Gated status extraction from Hugging Face API.
+- `src/aqruntime/cli/app.py`: `aq login` command implementation and Gated model error formatting.

@@ -1,0 +1,22 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v1.3
+
+---
+
+# 1. Power Lock Manager Architecture (`src/aqruntime/model/power_lock.py`)
+
+- `PowerLockManager`:
+  - Cross-platform helper managing system execution state locks.
+  - Windows: Uses `ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED)`.
+  - `acquire_lock()`: Locks OS sleep timer.
+  - `release_lock()`: Restores standard OS sleep timer.
+
+# 2. Integration into ModelManager & Web UI
+
+- `ModelManager.start_background_pull()` calls `PowerLockManager.acquire_lock()`.
+- Thread completion/error worker calls `PowerLockManager.release_lock()`.
+- `GET /api/pull/status` exposes `"sleep_lock_active": True/False`.
+- Web UI uses HTML5 `navigator.wakeLock.request('screen')`.

@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v0.9
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v0.9 – Documentation Baseline
+
+Target Version: PoC v0.9
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v0.9 introduces:
+- GGUF 4-bit Quantization Format support.
+- Low-RAM inference execution (~2.2 GB RAM for 3B models).
+- GGUF discovery catalog models (`[GGUF-Q4]`).
+- GGUF hardware threshold calculation in `HardwareDetector`.

@@ -1,0 +1,12 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v1.2
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_pull_inspect_api`: Verifies `/api/pull/inspect` returns inspection metadata.
+- `test_pull_reset_api`: Verifies `/api/pull/reset` clears cache and returns background download status.

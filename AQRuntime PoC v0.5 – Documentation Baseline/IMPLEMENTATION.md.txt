@@ -1,0 +1,13 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v0.5
+
+---
+
+# 1. Implementation Architecture
+
+- `src/aqruntime/memory/manager.py`: Short-Term Memory truncation and Long-Term Memory JSON file persistence.
+- `src/aqruntime/runtime/inference.py`: Integration of `MemoryManager` with `InferenceEngine`.
+- `src/aqruntime/cli/app.py`: Command flags `--memory`, `--no-memory`, `--session`, and `aq memory` subcommands.

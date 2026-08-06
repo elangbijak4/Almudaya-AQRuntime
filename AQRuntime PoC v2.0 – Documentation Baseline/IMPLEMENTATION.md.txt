@@ -1,0 +1,13 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v2.0
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/runtime/providers/`: Provider implementations.
+- `src/aqruntime/runtime/provider_manager.py`: ProviderManager.
+- `src/aqruntime/cli/main.py`: `aq runtime list` & `aq runtime info`.

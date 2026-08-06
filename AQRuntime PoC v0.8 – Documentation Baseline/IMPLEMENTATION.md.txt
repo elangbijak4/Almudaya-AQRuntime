@@ -1,0 +1,13 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v0.8
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/server/ui/index.html`: Embedded HTML/CSS/JS Web Dashboard.
+- `src/aqruntime/server/api.py`: Extended `AQRuntimeAPIHandler` to serve `/ui` and `/api/*` endpoints.
+- `src/aqruntime/cli/app.py`: Added `aq ui` command supporting browser launch.

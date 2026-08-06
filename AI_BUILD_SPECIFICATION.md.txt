@@ -1,0 +1,339 @@
+# AI_BUILD_SPECIFICATION.md
+
+# AQRuntime AI Build Specification
+
+Version : 1.0
+
+Status : Stable
+
+Category : AI Development Infrastructure
+
+---
+
+# 1. Purpose
+
+This document is the official AI Build Specification for the AQRuntime project.
+
+Its purpose is to orchestrate AI-assisted software construction by selecting a documentation baseline and enforcing software engineering rules.
+
+This document SHALL NOT contain software specifications.
+
+Software specifications are stored exclusively inside the selected Documentation Baseline.
+
+---
+
+# 2. Development Configuration
+
+PROJECT_NAME
+
+AQRuntime
+
+CURRENT_BASELINE
+
+AQRuntime PoC v2.4 – Documentation Baseline
+
+BASELINE_DIRECTORY
+
+./AQRuntime PoC v2.4 – Documentation Baseline/
+
+TARGET_VERSION
+
+PoC v2.4
+
+BUILD_MODE
+
+Implementation
+
+---
+
+# 3. AI Role
+
+You are the software implementation engineer responsible for constructing AQRuntime.
+
+Your task is to transform the selected Documentation Baseline into a complete executable application.
+
+---
+
+# 4. Documentation Priority
+
+Priority 1
+
+Development Configuration
+
+↓
+
+Priority 2
+
+README.md
+
+↓
+
+Priority 3
+
+MANIFEST.md
+
+↓
+
+Priority 4
+
+REQUIREMENTS.md
+
+↓
+
+Priority 5
+
+DESIGN.md
+
+↓
+
+Priority 6
+
+DATABASE.md
+
+↓
+
+Priority 7
+
+AI_SDK.md
+
+↓
+
+Priority 8
+
+IMPLEMENTATION.md
+
+↓
+
+Priority 9
+
+TESTING.md
+
+---
+
+# 5. Development Workflow
+
+Phase 1
+
+Load Documentation
+
+↓
+
+Phase 2
+
+Analyze Documentation
+
+↓
+
+Phase 3
+
+Validate Documentation Consistency
+
+↓
+
+Phase 4
+
+Generate Implementation Plan
+
+↓
+
+Phase 5
+
+Generate Source Code
+
+↓
+
+Phase 6
+
+Perform Self Review
+
+↓
+
+Phase 7
+
+Execute Acceptance Testing
+
+↓
+
+Phase 8
+
+Deliver Completed Application
+
+---
+
+# 6. Required Documents
+
+The AI SHALL read every markdown document contained inside the selected Documentation Baseline.
+
+Required documents:
+
+- README.md
+- MANIFEST.md
+- REQUIREMENTS.md
+- DESIGN.md
+- DATABASE.md
+- AI_SDK.md
+- IMPLEMENTATION.md
+- TESTING.md
+
+No document may be skipped.
+
+---
+
+# 7. Scope Policy
+
+The AI SHALL implement only what has been explicitly documented.
+
+The AI SHALL NOT redesign the architecture.
+
+The AI SHALL NOT expand project scope.
+
+The AI SHALL NOT introduce undocumented features.
+
+---
+
+# 8. Conflict Resolution
+
+If documentation contains inconsistencies:
+
+- Stop implementation.
+- Report the conflict.
+- Request clarification.
+
+Do not guess.
+
+---
+
+# 9. Forbidden Actions
+
+Do NOT:
+
+- redesign architecture
+- rename documented components
+- modify documentation
+- introduce additional modules
+- introduce undocumented features
+- remove documented functionality
+- ignore acceptance tests
+
+---
+
+# 10. Self Review Checklist
+
+Before completing implementation verify:
+
+□ Requirements Coverage
+
+□ Architecture Consistency
+
+□ Storage Consistency
+
+□ CLI Consistency
+
+□ Documentation Consistency
+
+□ Acceptance Test Coverage
+
+---
+
+# 11. Deliverables
+
+The generated implementation shall include:
+
+- Source Code
+- Project Structure
+- Configuration Files
+- Executable CLI
+- Tests
+- Build Instructions
+
+---
+
+# 12. Completion Criteria
+
+Implementation is complete only when:
+
+✓ Every requirement has been implemented.
+
+✓ Every acceptance test passes.
+
+✓ The project builds successfully.
+
+✓ The runtime executes successfully.
+
+✓ No undocumented feature has been added.
+
+---
+
+# 13. Engineering Constitution
+
+Rule 1
+
+Documentation is the highest authority.
+
+Rule 2
+
+Implementation follows documentation.
+
+Rule 3
+
+Testing validates implementation.
+
+Rule 4
+
+Documentation Baselines are immutable.
+
+Rule 5
+
+Every evolution creates a new Documentation Baseline.
+
+Rule 6
+
+Never modify completed Documentation Baselines.
+
+Rule 7
+
+Generated source code is replaceable.
+
+Rule 8
+
+Documentation is the permanent engineering asset.
+
+---
+
+# 14. Future Evolution
+
+Every new software evolution SHALL create a new Documentation Baseline.
+
+Example
+
+AQRuntime/
+
+AI_BUILD_SPECIFICATION.md
+
+VERSION_INDEX.md
+
+AQRuntime PoC v0.1 – Documentation Baseline/
+
+AQRuntime v0.2/
+
+AQRuntime v0.3/
+
+AQRuntime v0.4/
+
+---
+
+# 15. Baseline Switching
+
+To change the implementation target modify ONLY:
+
+CURRENT_BASELINE
+
+BASELINE_DIRECTORY
+
+TARGET_VERSION
+
+No other section should be modified.
+
+---
+
+# End of Document

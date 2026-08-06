@@ -1,0 +1,208 @@
+# MANIFEST.md
+
+# AQRuntime Project Manifest
+
+Version: PoC v0.1
+
+Status: Under Development
+
+---
+
+# Project Information
+
+Project Name
+
+AQRuntime
+
+Project Type
+
+Artificial Intelligence Runtime
+
+Development Model
+
+Waterfall
+
+Project Stage
+
+Proof of Concept (PoC)
+
+Version
+
+v0.1
+
+---
+
+# Project Objective
+
+Develop a minimal AI Runtime capable of downloading, storing, loading, and executing lightweight AI models through a command-line interface.
+
+---
+
+# Scope
+
+Included
+
+- AI Model Download
+- Local Model Storage
+- Model Loading
+- Interactive Inference
+- Command Line Interface
+
+Excluded
+
+- Agent Runtime
+- Workflow Engine
+- Memory System
+- Multi-Agent Architecture
+- Plugin System
+- NPU Runtime
+- GPU Optimization
+- Distributed Runtime
+- Hardware Abstraction Layer
+
+---
+
+# Document Graph
+
+README.md
+
+↓
+
+MANIFEST.md
+
+↓
+
+REQUIREMENTS.md
+
+↓
+
+DESIGN.md
+
+├── DATABASE.md
+
+├── AI_SDK.md
+
+└── IMPLEMENTATION.md
+
+↓
+
+TESTING.md
+
+---
+
+# Project Documents
+
+README.md
+
+Project overview.
+
+MANIFEST.md
+
+Project identity and document root.
+
+REQUIREMENTS.md
+
+Functional and non-functional requirements.
+
+DESIGN.md
+
+System architecture and component design.
+
+DATABASE.md
+
+Local storage and model repository design.
+
+AI_SDK.md
+
+CLI specification and SDK interfaces.
+
+IMPLEMENTATION.md
+
+Implementation guideline.
+
+TESTING.md
+
+Testing specification and acceptance tests.
+
+---
+
+# Version Policy
+
+Major Version
+
+Architecture changes.
+
+Minor Version
+
+Feature additions.
+
+Patch Version
+
+Bug fixes and documentation updates.
+
+Current Version
+
+0.1.0
+
+---
+
+# Development Rules
+
+1. Follow Waterfall sequentially.
+
+2. Complete each document before implementation.
+
+3. Do not expand project scope during PoC.
+
+4. Freeze documentation after completion.
+
+5. New features shall be implemented in the next development cycle.
+
+---
+
+# Proof of Concept Success Criteria
+
+The project is considered successful when AQRuntime is capable of:
+
+- Downloading an AI model.
+- Storing the model locally.
+- Listing installed models.
+- Loading the selected model.
+- Running interactive inference.
+- Removing installed models.
+
+---
+
+# Current Status
+
+README.md
+
+Completed
+
+MANIFEST.md
+
+Completed
+
+REQUIREMENTS.md
+
+Pending
+
+DESIGN.md
+
+Pending
+
+DATABASE.md
+
+Pending
+
+AI_SDK.md
+
+Pending
+
+IMPLEMENTATION.md
+
+Pending
+
+TESTING.md
+
+Pending

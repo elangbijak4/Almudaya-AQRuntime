@@ -1,0 +1,36 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v0.3
+
+---
+
+# 1. Directory & File Structure
+
+```
+AQRuntime/
+├── models/
+│   ├── tinyllama/
+│   └── google-gemma-2-2b-it/
+├── config/
+│   ├── runtime.yaml
+│   └── catalog_cache.json
+└── logs/
+    └── runtime.log
+```
+
+# 2. Catalog Cache Specification (`config/catalog_cache.json`)
+
+Stores JSON array of model catalog entries:
+```json
+[
+  {
+    "repo_id": "google/gemma-2-2b-it",
+    "name": "Gemma 2 2B Instruct",
+    "param_size_b": 2.6,
+    "est_ram_gb": 4.5,
+    "description": "Google lightweight high-performance LLM"
+  }
+]
+```

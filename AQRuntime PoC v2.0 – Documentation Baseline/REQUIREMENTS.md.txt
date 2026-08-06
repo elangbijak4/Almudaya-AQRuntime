@@ -1,0 +1,24 @@
+# REQUIREMENTS.md
+
+# AQRuntime Software Requirements Specification
+
+Version: PoC v2.0
+
+---
+
+# 1. Functional Requirements
+
+- FR-062: Pluggable Execution Provider interface (`src/aqruntime/runtime/providers/base.py`).
+- FR-063: Support CPU execution provider (`cpu`).
+- FR-064: Support Intel OpenVINO / NPU & Intel Arc iGPU provider (`intel_openvino`).
+- FR-065: Support DirectML execution provider (`directml`).
+- FR-066: Support NVIDIA CUDA execution provider (`cuda`).
+- FR-067: Support ONNX execution provider (`onnx`).
+- FR-068: Support Cloud API providers (`cloud_openai`, `cloud_huggingface`).
+- FR-069: Hardware capability auto-detection & provider registration (`ProviderManager`).
+- FR-070: Priority fallback chain (`Intel NPU` -> `Intel Arc` -> `OpenVINO` -> `DirectML` -> `CUDA` -> `CPU` -> `Cloud`).
+- FR-071: CLI command `aq runtime list` listing all available/installed runtimes.
+- FR-072: CLI command `aq runtime info <provider>` displaying detailed status, driver version, and supported tasks.
+- FR-073: `--runtime <provider>` flag in `aq run`.
+- FR-074: REST API endpoint `GET /api/runtimes`.
+- FR-075: Web Control Center GUI Execution Runtime Selector dropdown in Tab 1 and Tab 5.

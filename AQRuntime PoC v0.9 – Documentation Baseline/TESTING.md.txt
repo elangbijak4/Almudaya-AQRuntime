@@ -1,0 +1,13 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v0.9
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_gguf_loader_detection`: Verifies magic header `GGUF` detection.
+- `test_gguf_hardware_capacity`: Verifies `max_safe_param_size_gguf` capacity calculations.
+- `test_gguf_catalog_discovery`: Verifies `[GGUF-Q4]` model tags in discovery listing.

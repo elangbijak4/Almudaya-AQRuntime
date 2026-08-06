@@ -1,0 +1,37 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v0.7
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v0.7 – Documentation Baseline
+
+Target Version: PoC v0.7
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v0.7 introduces:
+- Local HTTP REST API Server (`aq serve`).
+- OpenAI-compatible `/v1/chat/completions` and `/v1/models` API endpoints.
+- Custom system prompt overriding support.

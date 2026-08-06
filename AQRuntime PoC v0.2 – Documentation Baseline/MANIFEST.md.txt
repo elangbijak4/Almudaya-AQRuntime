@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v0.2
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v0.2 – Documentation Baseline
+
+Target Version: PoC v0.2
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v0.2 introduces:
+- Fix for directory collision when downloading multiple models from identical repository owners.
+- Sanitized model key naming standard (`owner-repo`).
+- Alias fallback support for legacy model directories.
+- Memory optimization during model load phase for 16 GB RAM desktop/laptop systems.

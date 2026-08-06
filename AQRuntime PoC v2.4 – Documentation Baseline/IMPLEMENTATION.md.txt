@@ -1,0 +1,14 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v2.4
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/cli/app.py`: Explicit `aq help` CLI command and `--max-tokens` flag.
+- `src/aqruntime/runtime/inference.py`: Support `max_tokens` configuration.
+- `src/aqruntime/server/api.py`: Parse `max_tokens` from `/v1/chat/completions`.
+- `src/aqruntime/server/ui/index.html`: Max Output Tokens slider in Tab 1 & Tab 5 and Quantization Level badges (`Q4_K_M`, `Q5_K_M`, `Q8_0`, `FP16`).

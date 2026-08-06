@@ -1,0 +1,16 @@
+# REQUIREMENTS.md
+
+# AQRuntime Software Requirements Specification
+
+Version: PoC v1.6
+
+---
+
+# 1. Functional Requirements
+
+- FR-056: Friendly GATED Repo / Authorization Error formatting with step-by-step token guidance in chat.
+- FR-057: Download Terminal & GUI Hint prompt banner.
+- FR-058: Completion Toast Notification when download reaches 100%.
+- FR-059: Auto-Select Active Model & Auto-Switch to Chat Tab upon download completion.
+- FR-060: NVIDIA Open Models discovery search (`aq discover nvidia`) and catalog provider.
+- FR-061: Living Development History file (`docs/Development_History.md`) updated across all cycles.

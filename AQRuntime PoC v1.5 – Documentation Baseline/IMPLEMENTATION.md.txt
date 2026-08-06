@@ -1,0 +1,14 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v1.5
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/memory/manager.py`: `copy_session` and `get_session_messages`.
+- `src/aqruntime/runtime/core.py`: `memory_copy` and `memory_get`.
+- `src/aqruntime/server/api.py`: Added endpoints `/api/memory/session` and `/api/memory/copy`.
+- `src/aqruntime/server/ui/index.html`: "➕ New Chat" Button and Model Switch Modal.

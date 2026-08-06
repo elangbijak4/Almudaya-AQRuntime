@@ -1,0 +1,19 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v0.7
+
+---
+
+# 1. Local HTTP REST API Server Design (`src/aqruntime/server/api.py`)
+
+- Built using Python's `http.server.HTTPServer` and `BaseHTTPRequestHandler`.
+- Routes:
+  - `GET /health` -> `{"status": "ok", "version": "0.7.0"}`
+  - `GET /v1/models` -> OpenAI-compatible model list structure.
+  - `POST /v1/chat/completions` -> Accepts OpenAI payload (`model`, `messages`), runs inference, returns OpenAI-compatible chat completion JSON.
+
+# 2. Custom System Prompt Integration
+
+- `InferenceEngine.__init__(..., system_prompt=None)` overrides the default system prompt when supplied.

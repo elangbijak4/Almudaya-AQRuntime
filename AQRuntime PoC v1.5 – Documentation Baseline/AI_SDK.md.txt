@@ -1,0 +1,14 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v1.5
+
+---
+
+# 1. API Endpoints
+
+| Endpoint | Description |
+|---|---|
+| `GET /api/memory/session?name=<session>` | Returns messages array for active session |
+| `POST /api/memory/copy` | Copies conversation context between models |

@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v0.4
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v0.4 – Documentation Baseline
+
+Target Version: PoC v0.4
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v0.4 introduces:
+- Token Authentication command (`aq login`).
+- Hugging Face token persistence in configuration.
+- Gated model exception handling with step-by-step guidance.
+- Gated model indicators in `aq discover`.

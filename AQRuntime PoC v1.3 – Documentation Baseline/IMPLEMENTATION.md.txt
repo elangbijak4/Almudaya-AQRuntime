@@ -1,0 +1,13 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v1.3
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/model/power_lock.py`: `PowerLockManager` implementation.
+- `src/aqruntime/model/manager.py`: Integrates `PowerLockManager` into `start_background_pull`.
+- `src/aqruntime/server/ui/index.html`: `Screen Wake Lock` API & live `🛡️ Sleep Lock Active` badge.

@@ -1,0 +1,12 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v2.4
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_aq_help_command`: Verifies explicit `aq help` CLI output formatting.
+- `test_max_tokens_configuration`: Verifies dynamic token output limits up to 8192 tokens.

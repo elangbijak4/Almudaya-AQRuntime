@@ -1,0 +1,14 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v2.3
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/model/audio.py`: AudioProcessor for speech transcription and format validation.
+- `src/aqruntime/catalog/manager.py`: Curated Audio models (`openai/whisper-tiny`, `openai/whisper-base`, `Qwen/Qwen2-Audio-7B`).
+- `src/aqruntime/server/api.py`: Added `POST /api/audio/transcribe` REST API endpoint.
+- `src/aqruntime/server/ui/index.html`: `🎙️ Voice Input` button, live recording state, `🔊 Read Aloud` TTS button, and `🎙️ Audio Models` filter.

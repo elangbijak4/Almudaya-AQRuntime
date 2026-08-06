@@ -1,0 +1,11 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v2.3
+
+---
+
+# 1. Audio REST API
+
+- `POST /api/audio/transcribe`: Ingests Base64 audio payload or binary buffer and returns `{"text": "Transcribed speech text"}`.

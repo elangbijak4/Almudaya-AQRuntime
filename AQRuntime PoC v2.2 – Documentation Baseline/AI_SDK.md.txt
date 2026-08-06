@@ -1,0 +1,12 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v2.2
+
+---
+
+# 1. Multimodal API
+
+- `/v1/chat/completions` payload supports `image_url` object in `content` array:
+  `{"type": "image_url", "image_url": {"url": "data:image/png;base64,..."}}`.

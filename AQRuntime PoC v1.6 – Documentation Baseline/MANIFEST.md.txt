@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v1.6
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v1.6 – Documentation Baseline
+
+Target Version: PoC v1.6
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v1.6 introduces:
+- GATED Model Error Diagnostic formatting.
+- Download Completion Toast & Auto-Switch to Chat.
+- NVIDIA Open Models Catalog (`aq discover nvidia`).
+- Living Development History (`docs/Development_History.md`).

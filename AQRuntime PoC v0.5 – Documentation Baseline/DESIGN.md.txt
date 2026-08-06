@@ -1,0 +1,39 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v0.5
+
+---
+
+# 1. System Architecture
+
+```
++-------------------------------------------------------+
+|             Command Line Interface (CLI)              |
+|              (src/aqruntime/cli/app.py)               |
++--------------------------+----------------------------+
+                           |
+                           v
++-------------------------------------------------------+
+|                     Runtime Core                      |
+|             (src/aqruntime/runtime/core.py)           |
++------+-----------+---------------+----------+---------+
+       |           |               |          |
+       v           v               v          v
++----------+ +-----------+ +------------+ +--------+
+|  Model   | |  Storage  | | Hardware   | | Memory |
+| Manager  | |  Manager  | | Detector   | |Manager |
++----------+ +-----------+ +------------+ +--------+
+```
+
+# 2. Memory Subsystem Design (`src/aqruntime/memory/manager.py`)
+
+- **Short-Term Memory (STM)**: Limits in-memory conversation context to maximum `max_history_turns` or max tokens, removing old turns while retaining system prompt.
+- **Long-Term Memory (LTM)**: Saves/loads JSON session arrays from `memory/<session_name>.json`.
+- **Management API**:
+  - `load_session(session_name)`
+  - `save_session(session_name, messages)`
+  - `list_sessions()`
+  - `clear_session(session_name)`
+  - `export_session(session_name, target_path)`

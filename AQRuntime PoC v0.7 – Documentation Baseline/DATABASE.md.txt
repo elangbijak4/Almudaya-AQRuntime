@@ -1,0 +1,13 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v0.7
+
+---
+
+# 1. Configuration & Server Metadata
+
+- Config File: `config/runtime.yaml` (`runtime_version: "0.7.0"`)
+- Memory Storage: `memory/<session_name>.json`
+- Model Directory: `models/<sanitized_repo_name>/`

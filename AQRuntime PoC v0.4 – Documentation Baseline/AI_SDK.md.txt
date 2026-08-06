@@ -1,0 +1,19 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v0.4
+
+---
+
+# 1. CLI Commands
+
+| Command | Description |
+|---|---|
+| `aq login [token]` | Save Hugging Face User Access Token |
+| `aq pull <model> [--token <token>]` | Download model (supports optional token flag) |
+| `aq discover [query]` | Discover models matching hardware |
+| `aq list` | List installed models |
+| `aq run <model>` | Execute model inference session |
+| `aq remove <model>` | Remove installed model |
+| `aq version` | Display runtime version (0.4.0) |

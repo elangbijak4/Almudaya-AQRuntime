@@ -1,0 +1,58 @@
+# REQUIREMENTS.md
+
+# AQRuntime Software Requirements Specification
+
+Version: PoC v1.0
+
+---
+
+# 1. Functional Requirements
+
+- FR-001: Download AI Model from Hugging Face repository.
+- FR-002: Store Model in local storage using sanitized repository identifier (`owner-repository`).
+- FR-003: List installed models safely.
+- FR-004: Load AI Model using RAM-optimized parameters (`low_cpu_mem_usage`, auto dtype).
+- FR-005: Interactive Inference execution with multi-turn conversation context.
+- FR-006: User Prompt input via CLI.
+- FR-007: Model Response generation with chat template formatting.
+- FR-008: Exit Session when requested with clean memory release.
+- FR-009: Remove Model by name or alias.
+- FR-010: Version Information display.
+- FR-011: Multi-model Storage Isolation.
+- FR-012: Hardware Detection of system RAM and computing capacity.
+- FR-013: Smart Model Discovery (`aq discover`).
+- FR-014: Gated Model Detection and step-by-step guidance.
+- FR-015: Hugging Face Token Authentication (`aq login`).
+- FR-016: Short-Term Memory sliding window context management.
+- FR-017: Long-Term Memory persistence in local JSON files.
+- FR-018: Memory session management subcommands (`aq memory list/clear/export`).
+- FR-019: Pre-installation hardware diagnostic check & minimum requirement verification (`aq doctor`).
+- FR-020: Minimum model recommendation guidance.
+- FR-021: Pre-download model file size estimation.
+- FR-022: Pre-download interactive confirmation prompt.
+- FR-023: Non-interactive confirmation bypass flag (`aq pull --yes`).
+- FR-024: Local HTTP REST API Server launch (`aq serve`).
+- FR-025: OpenAI-compatible `/v1/chat/completions` endpoint.
+- FR-026: OpenAI-compatible `/v1/models` list endpoint.
+- FR-027: Health check `/health` endpoint.
+- FR-028: Custom System Prompt override support (`--system`).
+- FR-029: Launch Integrated Web UI Dashboard via single command (`aq ui`).
+- FR-030: Automatic default web browser launch on `aq ui`.
+- FR-031: Serve Embedded Single-Page Dashboard (`/ui`).
+- FR-032: REST API endpoints for hardware diagnostics and memory actions.
+- FR-033: GGUF 4-bit / 8-bit model file format detection and loading (`src/aqruntime/model/gguf_loader.py`).
+- FR-034: Ultra-low RAM footprint execution for GGUF models.
+- FR-035: GGUF discovery catalog models tagged `[GGUF-Q4]`.
+- FR-036: GGUF hardware threshold calculation (`max_safe_param_size_gguf()`).
+- FR-037: Fix chat messages scrolling behavior in GUI.
+- FR-038: 5-Tab Desktop Control Center Web GUI representing full CLI suite visually.
+- FR-039: API endpoint for model discovery (`/api/discover`).
+- FR-040: API endpoint for 1-Click model pulling (`/api/pull`).
+- FR-041: API endpoint for 1-Click model deletion (`/api/remove`).
+- FR-042: API endpoint for HF token saving (`/api/login`).
+
+---
+
+# 2. Non-Functional Requirements
+
+- NFR-001: Pure HTML/CSS/JS frontend with zero external framework dependencies.

@@ -1,0 +1,11 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v2.2
+
+---
+
+# 1. Vision Architecture
+
+- `VisionProcessor`: Processes Base64 image payload into image embeddings/attributes and formats visual prompts.

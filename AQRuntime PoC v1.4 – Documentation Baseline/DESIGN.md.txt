@@ -1,0 +1,18 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v1.4
+
+---
+
+# 1. GGUF Inference Engine Routing (`src/aqruntime/runtime/inference.py`)
+
+- `InferenceEngine.generate(prompt)` checks:
+  If `isinstance(self.model, GGUFModelWrapper)` or `isinstance(self.model, SimulatedGGUFModel)` or `getattr(self.model, "is_gguf", False)`:
+  Routes to `_generate_gguf(prompt)`.
+
+- `_generate_gguf(prompt)`:
+  - Formats messages with chat template.
+  - Calls `self.model.generate_text(prompt)` or `self.model.llm(formatted_prompt)`.
+  - Appends to conversation history and saves memory session cleanly.

@@ -1,0 +1,14 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v1.2
+
+---
+
+# 1. Configuration & Asset Files
+
+- Config File: `config/runtime.yaml` (`runtime_version: "1.2.0"`)
+- Offline Catalog Cache: `config/catalog_cache.json`
+- UI Single-Page Asset: `src/aqruntime/server/ui/index.html`
+- Local Cache Directory: `~/.cache/huggingface/hub/`

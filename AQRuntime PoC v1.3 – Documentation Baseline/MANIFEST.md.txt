@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v1.3
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v1.3 – Documentation Baseline
+
+Target Version: PoC v1.3
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v1.3 introduces:
+- Sleep Prevention & OS Power Lock Engine (`PowerLockManager`).
+- Windows Native `SetThreadExecutionState` integration.
+- Browser Screen Wake Lock API integration.
+- Live GUI Protection Badge (`🛡️ Sleep Lock Active`).

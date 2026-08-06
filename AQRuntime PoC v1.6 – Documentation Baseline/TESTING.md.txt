@@ -1,0 +1,12 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v1.6
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_nvidia_catalog_discovery`: Verifies `CatalogManager.discover_models("nvidia")`.
+- `test_gated_error_formatting`: Verifies GATED error diagnostic message formatting.

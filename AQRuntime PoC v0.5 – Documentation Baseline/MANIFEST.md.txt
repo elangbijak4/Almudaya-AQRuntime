@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v0.5
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v0.5 – Documentation Baseline
+
+Target Version: PoC v0.5
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v0.5 introduces:
+- Short-Term Memory (in-session token sliding window).
+- Long-Term Memory (persistent JSON memory store in `memory/`).
+- User privacy controls (`--memory`, `--no-memory`, `--session`).
+- Memory management subcommands (`aq memory list`, `aq memory clear`, `aq memory export`).

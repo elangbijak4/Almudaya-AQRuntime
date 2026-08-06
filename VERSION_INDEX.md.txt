@@ -1,0 +1,137 @@
+# VERSION_INDEX.md
+
+# AQRuntime Documentation Baseline Index
+
+Version : 1.0
+
+Status : Active
+
+---
+
+# Purpose
+
+This document maintains the official index of all Documentation Baselines created during the evolution of AQRuntime.
+
+Each Documentation Baseline represents one complete Waterfall development cycle.
+
+Documentation Baselines are immutable.
+
+---
+
+# Documentation Baselines
+
+| Version | Status | Directory | Description |
+|----------|--------|-----------|-------------|
+| PoC v0.1 | Frozen | AQRuntime PoC v0.1 – Documentation Baseline | Minimum AI Runtime Proof of Concept |
+| PoC v0.2 | Frozen | AQRuntime PoC v0.2 – Documentation Baseline | Multi-model Collision-free Storage & Memory Optimization |
+| PoC v0.3 | Frozen | AQRuntime PoC v0.3 – Documentation Baseline | Hardware-Aware Model Discovery & Offline Fallback |
+| PoC v0.4 | Frozen | AQRuntime PoC v0.4 – Documentation Baseline | Gated Model Detection & Token Authentication |
+| PoC v0.5 | Frozen | AQRuntime PoC v0.5 – Documentation Baseline | Short-Term & Long-Term Conversation Memory System |
+| PoC v0.6 | Frozen | AQRuntime PoC v0.6 – Documentation Baseline | Pre-Install Hardware Diagnostic & Pre-Download Confirmation |
+| PoC v0.7 | Frozen | AQRuntime PoC v0.7 – Documentation Baseline | Local HTTP REST API Server & Custom System Prompts |
+| PoC v0.8 | Frozen | AQRuntime PoC v0.8 – Documentation Baseline | Integrated Web UI Dashboard (aq ui) |
+| PoC v0.9 | Frozen | AQRuntime PoC v0.9 – Documentation Baseline | GGUF 4-bit Quantization Engine & Low-RAM Execution |
+| PoC v1.0 | Frozen | AQRuntime PoC v1.0 – Documentation Baseline | Desktop Control Center Web GUI & Full CLI Suite Visualization |
+| PoC v1.1 | Frozen | AQRuntime PoC v1.1 – Documentation Baseline | Async Download Engine & Real-Time Progress Polling |
+| PoC v1.2 | Frozen | AQRuntime PoC v1.2 – Documentation Baseline | Smart Download Inspection, Resume Modal & Reset Engine |
+| PoC v1.3 | Frozen | AQRuntime PoC v1.3 – Documentation Baseline | Sleep Prevention & OS Power Lock Engine |
+| PoC v1.4 | Frozen | AQRuntime PoC v1.4 – Documentation Baseline | GGUF Model Inference Engine Execution Fix |
+| PoC v1.5 | Frozen | AQRuntime PoC v1.5 – Documentation Baseline | Cross-Model Memory Continuity & Session Control |
+| PoC v1.6 | Frozen | AQRuntime PoC v1.6 – Documentation Baseline | GATED Diagnostics, Download Toasts & NVIDIA Catalog |
+| PoC v2.0 | Frozen | AQRuntime PoC v2.0 – Documentation Baseline | Pluggable Execution Provider Engine & Hardware Acceleration |
+| PoC v2.1 | Frozen | AQRuntime PoC v2.1 – Documentation Baseline | GitHub Release Edition: Performance Telemetry, File Reader & Persona Presets |
+| PoC v2.2 | Frozen | AQRuntime PoC v2.2 – Documentation Baseline | Multimodal Vision & Image Analysis Engine |
+| PoC v2.3 | Frozen | AQRuntime PoC v2.3 – Documentation Baseline | Voice Audio & Speech Engine |
+| PoC v2.4 | Implementation | AQRuntime PoC v2.4 – Documentation Baseline | GitHub Final Release Edition: Explicit aq help CLI, Max Tokens & Quantization |
+
+---
+
+# Baseline Status Definitions
+
+Development
+
+Documentation is currently being written.
+
+Frozen
+
+Documentation is complete and immutable.
+
+Implementation
+
+Source code is under construction.
+
+Released
+
+Implementation has passed all acceptance tests.
+
+Deprecated
+
+Documentation retained for historical reference.
+
+---
+
+# Current Development Target
+
+Current Baseline
+
+AQRuntime PoC v2.4 – Documentation Baseline
+
+Current Version
+
+PoC v2.4
+
+Current Status
+
+Implementation
+
+---
+
+# Evolution Policy
+
+Every new development cycle SHALL:
+
+- Create a new Documentation Baseline.
+- Preserve previous Documentation Baselines.
+- Maintain backward traceability.
+
+Documentation SHALL NEVER be overwritten.
+
+---
+
+# Future Documentation Baselines
+
+Reserved
+
+AQRuntime v0.2
+
+Reserved
+
+AQRuntime v0.3
+
+Reserved
+
+AQRuntime v0.4
+
+Reserved
+
+AQRuntime v1.0
+
+---
+
+# Version History
+
+Version 1.0
+
+Initial Documentation Baseline Index.
+
+---
+
+# Engineering Principle
+
+Documentation evolves by creating new baselines.
+
+Documentation never evolves by replacing previous baselines.
+
+---
+
+# End of Document

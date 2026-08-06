@@ -1,0 +1,39 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v2.3
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v2.3 – Documentation Baseline
+
+Target Version: PoC v2.3
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v2.3 introduces:
+- Voice Audio & Speech Engine (`AudioProcessor`).
+- Live Microphone Recording Input (`🎙️`).
+- Text-to-Speech Output (`🔊 Read Aloud`).
+- Audio Transcribe API (`POST /api/audio/transcribe`).
+- Audio Discovery (`aq discover audio`).

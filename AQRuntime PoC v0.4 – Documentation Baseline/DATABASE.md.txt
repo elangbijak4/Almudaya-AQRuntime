@@ -1,0 +1,17 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v0.4
+
+---
+
+# 1. Configuration File (`config/runtime.yaml`)
+
+```yaml
+runtime_version: "0.4.0"
+default_model: null
+model_directory: "models"
+log_directory: "logs"
+hf_token: "hf_xxxxxxxxxxxxxxxxxxxx"
+```

@@ -1,0 +1,17 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v1.5
+
+---
+
+# 1. Memory Manager Memory Copy & Session Messages (`src/aqruntime/memory/manager.py`)
+
+- `copy_session(source_session, target_session)`: Reads `source_session.json` and copies messages into `target_session.json`.
+- `get_session_messages(session_name)`: Reads and returns JSON message array for UI rendering.
+
+# 2. REST API Endpoints
+
+- `GET /api/memory/session?name=<session>`: Returns JSON message array for active session.
+- `POST /api/memory/copy`: Body `{"source": "gemma", "target": "tinyllama"}` -> Executes memory copy.

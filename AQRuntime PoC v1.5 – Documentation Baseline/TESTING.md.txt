@@ -1,0 +1,11 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v1.5
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_memory_copy_and_get`: Verifies `MemoryManager.copy_session()` and `MemoryManager.get_session_messages()`.

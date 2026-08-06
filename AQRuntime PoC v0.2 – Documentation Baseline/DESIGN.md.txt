@@ -1,0 +1,43 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v0.2
+
+---
+
+# 1. System Architecture
+
+```
++-------------------------------------------------------+
+|             Command Line Interface (CLI)              |
+|              (src/aqruntime/cli/app.py)               |
++--------------------------+----------------------------+
+                           |
+                           v
++-------------------------------------------------------+
+|                     Runtime Core                      |
+|             (src/aqruntime/runtime/core.py)           |
++--------------------------+----------------------------+
+                           |
+       +-------------------+-------------------+
+       |                   |                   |
+       v                   v                   v
++--------------+    +--------------+    +------------------+
+| Model Manager|    |StorageManager|    | Inference Engine |
+| (src/model/) |    |(src/storage/)|    |  (src/runtime/)  |
++--------------+    +--------------+    +------------------+
+```
+
+# 2. Key Component Enhancements in PoC v0.2
+
+## Storage Manager (`src/aqruntime/storage/manager.py`)
+- Full repository sanitization: Converts `owner/repo-name` to `owner-repo-name`.
+- Alias lookup: Resolves short name (e.g. `tinyllama` or `gemma-2b`) if uniquely matching an installed model folder.
+
+## Model Manager (`src/aqruntime/model/manager.py`)
+- Uses `low_cpu_mem_usage=True` and `torch_dtype` auto-detection during `AutoModelForCausalLM.from_pretrained` calls.
+- Provides friendly exceptions for download failures or memory allocation errors.
+
+## Inference Engine (`src/aqruntime/runtime/inference.py`)
+- Preserves system prompt and conversation history while managing prompt context lengths cleanly.

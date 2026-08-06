@@ -1,0 +1,12 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v1.0
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/server/ui/index.html`: Complete 5-tab Desktop Control Center Web GUI.
+- `src/aqruntime/server/api.py`: Added REST API routes `/api/discover`, `/api/pull`, `/api/remove`, `/api/login`.

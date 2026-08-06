@@ -1,0 +1,11 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v2.4
+
+---
+
+# 1. API Extensions
+
+- `/v1/chat/completions` accepts `"max_tokens": 2048` parameter for controlling generation length up to 8192 tokens.

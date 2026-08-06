@@ -1,0 +1,14 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v2.2
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/model/vision.py`: VisionProcessor for processing multimodal Base64 image payloads.
+- `src/aqruntime/catalog/manager.py`: Curated Vision models (`moondream2`, `paligemma-3b-pt-224`, `Qwen2-VL-2B-Instruct`).
+- `src/aqruntime/server/api.py`: Multimodal payload extraction in `/v1/chat/completions`.
+- `src/aqruntime/server/ui/index.html`: `🖼️ Image Input` button, Live Preview canvas, and Vision models filter button.

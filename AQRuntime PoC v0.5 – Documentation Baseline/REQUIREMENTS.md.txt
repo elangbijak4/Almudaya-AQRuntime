@@ -1,0 +1,35 @@
+# REQUIREMENTS.md
+
+# AQRuntime Software Requirements Specification
+
+Version: PoC v0.5
+
+---
+
+# 1. Functional Requirements
+
+- FR-001: Download AI Model from Hugging Face repository.
+- FR-002: Store Model in local storage using sanitized repository identifier (`owner-repository`).
+- FR-003: List installed models safely.
+- FR-004: Load AI Model using RAM-optimized parameters (`low_cpu_mem_usage`, auto dtype).
+- FR-005: Interactive Inference execution with multi-turn conversation context.
+- FR-006: User Prompt input via CLI.
+- FR-007: Model Response generation with chat template formatting.
+- FR-008: Exit Session when requested with clean memory release.
+- FR-009: Remove Model by name or alias.
+- FR-010: Version Information display.
+- FR-011: Multi-model Storage Isolation.
+- FR-012: Hardware Detection of system RAM and computing capacity.
+- FR-013: Smart Model Discovery (`aq discover`).
+- FR-014: Gated Model Detection and step-by-step guidance.
+- FR-015: Hugging Face Token Authentication (`aq login`).
+- FR-016: Short-Term Memory sliding window context management during active sessions.
+- FR-017: Long-Term Memory persistence saving chat sessions in local JSON files.
+- FR-018: Memory session management subcommands (`aq memory list`, `aq memory clear`, `aq memory export`).
+
+---
+
+# 2. Non-Functional Requirements
+
+- NFR-001: User choice over memory persistence (`--memory`, `--no-memory`, `--session`).
+- NFR-002: Transparent JSON memory storage in `memory/`.

@@ -1,0 +1,51 @@
+# AQRuntime Git Ignore Rules
+
+# 1. AI Model Directories & Weight Files (Keep repository lightweight & clean)
+models/
+*.gguf
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.onnx
+
+# 2. Virtual Environment & Python Caches
+.venv/
+venv/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 3. Logs, Memory Sessions & Caches
+logs/
+memory/
+memory_*_export.md
+config/catalog_cache.json
+*.log
+
+# 4. OS & IDE System Files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

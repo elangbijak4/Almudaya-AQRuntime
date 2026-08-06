@@ -1,0 +1,13 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v0.5
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_memory_persistence`: Verifies session turns persist to JSON file and reload upon subsequent sessions.
+- `test_ephemeral_no_memory_mode`: Verifies `--no-memory` flag prevents history loading and disk persistence.
+- `test_memory_clear_command`: Verifies clearing a session deletes memory JSON file.

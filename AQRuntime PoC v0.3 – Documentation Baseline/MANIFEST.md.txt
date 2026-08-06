@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v0.3
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v0.3 – Documentation Baseline
+
+Target Version: PoC v0.3
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v0.3 introduces:
+- Hardware Detection module for inspecting RAM and computing limits.
+- Model discovery command (`aq discover`).
+- Online Hugging Face API integration with offline catalog cache fallback (`config/catalog_cache.json`).
+- Compatibility filtering based on host hardware specs.

@@ -1,0 +1,13 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v1.3
+
+---
+
+# 1. Configuration & Asset Files
+
+- Config File: `config/runtime.yaml` (`runtime_version: "1.3.0"`)
+- Power Lock Module: `src/aqruntime/model/power_lock.py`
+- Single-Page UI Asset: `src/aqruntime/server/ui/index.html`

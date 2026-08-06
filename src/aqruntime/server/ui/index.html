@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AQRuntime Control Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e1b4b 100%);
+      --glass-bg: rgba(15, 23, 42, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-hover: rgba(255, 255, 255, 0.15);
+      --accent-purple: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --accent-gradient: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --user-msg-bg: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      --bot-msg-bg: rgba(30, 41, 59, 0.85);
+      --success-green: #10b981;
+      --card-bg: rgba(30, 41, 59, 0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Bar Header */
+    header {
+      height: 64px;
+      padding: 0 24px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-gradient);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      -webkit-text-fill-color: initial;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .tab-btn.active {
+      background: var(--accent-gradient);
+      color: white;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .header-badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+    }
+    .badge-status {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    /* Main Container */
+    .app-body {
+      flex: 1 1 0;
+      height: 0;
+      min-height: 0;
+      display: flex;
+    }
+
+    .tab-content {
+      display: none;
+      flex: 1 1 0;
+      height: 100%;
+      min-height: 0;
+      width: 100%;
+    }
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Tab 1: Chat Layout */
+    .chat-layout {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+    aside {
+      width: 300px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .panel-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label { font-size: 0.85rem; color: var(--text-main); font-weight: 500; }
+    select, textarea, input {
+      width: 100%;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    select:focus, textarea:focus, input:focus {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+    }
+
+    main {
+      flex: 1 1 0;
+      height: 100%;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    /* CRITICAL FIX FOR CHAT SCROLLING */
+    .chat-messages {
+      flex: 1 1 0;
+      height: 0;
+      min-height: 0;
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .message {
+      max-width: 80%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      animation: fadeIn 0.3s ease-out;
+      word-break: break-word;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .message.user {
+      align-self: flex-end;
+      background: var(--user-msg-bg);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .message.assistant {
+      align-self: flex-start;
+      background: var(--bot-msg-bg);
+      border: 1px solid var(--glass-border);
+      border-bottom-left-radius: 4px;
+    }
+    .message-meta {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .chat-input-area {
+      padding: 16px 24px;
+      background: rgba(15, 23, 42, 0.85);
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+    .chat-input-area textarea {
+      resize: none;
+      height: 52px;
+      border-radius: 14px;
+    }
+    .btn-send {
+      height: 52px;
+      padding: 0 24px;
+      background: var(--accent-gradient);
+      border: none;
+      border-radius: 14px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .btn-send:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Generic Tab View Container */
+    .view-container {
+      flex: 1;
+      padding: 28px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .view-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .view-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* Grid Layouts */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      font-size: 0.8rem;
+    }
+    .btn-action {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .btn-action:hover {
+      background: var(--accent-gradient);
+      color: white;
+    }
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.15);
+      border-color: rgba(244, 63, 94, 0.3);
+      color: #f43f5e;
+    }
+    .btn-danger:hover {
+      background: #f43f5e;
+      color: white;
+    }
+
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding: 8px 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-icon">AQ</div>
+      <span>AQRuntime Control Center</span>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('chat')">💬 Chat & Infer</button>
+      <button class="tab-btn" onclick="switchTab('hub')">🔍 Model Hub</button>
+      <button class="tab-btn" onclick="switchTab('installed')">📦 Installed</button>
+      <button class="tab-btn" onclick="switchTab('doctor')">🩺 Hardware Doctor</button>
+      <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
+    </div>
+
+    <div class="header-badges">
+      <span class="badge badge-status">v1.0.0</span>
+      <span class="badge" id="hw-badge">RAM Check...</span>
+    </div>
+  </header>
+
+  <div class="app-body">
+    <!-- TAB 1: CHAT -->
+    <div class="tab-content active" id="tab-chat">
+      <div class="chat-layout">
+        <aside>
+          <div>
+            <div class="panel-title">Model Selection</div>
+            <div class="form-group">
+              <label for="model-select">Active Model</label>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <select id="model-select" style="flex: 1; min-width: 140px;">
+                  <option value="">Loading installed models...</option>
+                </select>
+                <button class="btn-action" style="padding: 8px 12px; font-size: 0.8rem;" title="Start Fresh Chat" onclick="startNewChat()">➕ New Chat</button>
+                <button class="btn-action" style="padding: 8px 12px; font-size: 0.8rem; background: rgba(59, 130, 246, 0.15); border-color: rgba(59,130,246,0.3);" title="Export Chat to Markdown" onclick="exportChatMarkdown()">📥 Export (.md)</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="panel-title">Execution Engine</div>
+            <div class="form-group">
+              <label for="runtime-select">Hardware Acceleration</label>
+              <select id="runtime-select">
+                <option value="auto">⚡ Auto-Best Priority (NPU ➔ Arc ➔ CPU)</option>
+                <option value="intel_openvino">⚡ Intel NPU / Intel Arc (OpenVINO)</option>
+                <option value="directml">🎮 DirectML (Windows DirectX 12)</option>
+                <option value="cuda">🚀 NVIDIA CUDA GPU</option>
+                <option value="cpu">💻 CPU Engine Only</option>
+                <option value="cloud_openai">☁️ Cloud OpenAI Fallback</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <div class="panel-title">System Persona</div>
+            <div class="form-group">
+              <label for="persona-preset">Persona Gallery Preset</label>
+              <select id="persona-preset" style="margin-bottom: 8px;" onchange="applyPersonaPreset()">
+                <option value="default">🤖 Default Assistant (General)</option>
+                <option value="python">🐍 Python Coding Expert</option>
+                <option value="translator">🌐 Indonesian Translator</option>
+                <option value="editor">📝 Technical Content Editor</option>
+                <option value="scholar">🔬 Physics & Science Scholar</option>
+              </select>
+              <label for="system-prompt">Custom System Prompt</label>
+              <textarea id="system-prompt" rows="3" placeholder="You are AQRuntime Assistant. Be helpful and concise."></textarea>
+            </div>
+          </div>
+
+          <div>
+            <div class="panel-title">Generation Limits</div>
+            <div class="form-group">
+              <label for="max-tokens-slider">Max Output Tokens: <span id="max-tokens-val" style="color: var(--primary-light); font-weight: bold;">512</span></label>
+              <input type="range" id="max-tokens-slider" min="64" max="8192" step="64" value="512" style="width: 100%; accent-color: var(--primary-color);" oninput="document.getElementById('max-tokens-val').innerText = this.value">
+              <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">
+                <span>64 (Short)</span>
+                <span>2048 (Document)</span>
+                <span>8192 (Long)</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: auto; font-size: 0.75rem; color: var(--text-muted);">
+            AQRuntime Control Center v2.4.0 &bull; GitHub Final Release Edition
+          </div>
+        </aside>
+
+        <main>
+          <div class="chat-messages" id="chat-messages">
+            <div class="message assistant">
+              <div class="message-meta">AQRuntime Assistant</div>
+              Welcome to AQRuntime Control Center v2.4! Select an installed model, adjust max output tokens, attach files 📎/images 🖼️, speak with mic 🎙️, listen to responses 🔊, and start chatting locally.
+            </div>
+          </div>
+          <div class="typing-indicator" id="typing-indicator">Model is thinking...</div>
+
+          <div id="file-attachment-preview" style="display: none; padding: 6px 12px; font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); border: 1px dashed rgba(59, 130, 246, 0.3); border-radius: 6px; margin-bottom: 8px; color: var(--primary-light);">
+            📎 <span id="file-attachment-name"></span>
+            <button onclick="clearFileAttachment()" style="background: transparent; border: none; color: #ef4444; margin-left: 8px; cursor: pointer; font-weight: bold;">✕</button>
+          </div>
+
+          <div id="image-attachment-preview" style="display: none; padding: 8px 12px; font-size: 0.8rem; background: rgba(168, 85, 247, 0.1); border: 1px dashed rgba(168, 85, 247, 0.4); border-radius: 6px; margin-bottom: 8px; color: #c084fc; align-items: center; gap: 10px;">
+            🖼️ <img id="image-preview-thumb" style="max-height: 48px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);">
+            <span id="image-attachment-name"></span>
+            <button onclick="clearImageAttachment()" style="background: transparent; border: none; color: #ef4444; margin-left: auto; cursor: pointer; font-weight: bold; font-size: 1rem;">✕</button>
+          </div>
+
+          <div class="chat-input-area">
+            <input type="file" id="file-input" style="display: none;" onchange="handleFileSelected(event)" accept=".txt,.py,.json,.md,.log,.csv,.c,.cpp,.h">
+            <input type="file" id="image-input" style="display: none;" onchange="handleImageSelected(event)" accept="image/*">
+            <button class="btn-action" style="padding: 12px 14px; font-size: 1.1rem;" title="Attach Code/Text File" onclick="document.getElementById('file-input').click()">📎</button>
+            <button class="btn-action" style="padding: 12px 14px; font-size: 1.1rem; background: rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.4);" title="Attach Image for Vision AI" onclick="document.getElementById('image-input').click()">🖼️</button>
+            <button class="btn-action" id="btn-mic" style="padding: 12px 14px; font-size: 1.1rem; background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4);" title="Record Voice with Microphone" onclick="toggleVoiceRecording()">🎙️</button>
+            <textarea id="user-input" placeholder="Ask AQRuntime anything or speak with mic... (Press Enter to send)"></textarea>
+            <button class="btn-send" id="btn-send">Send</button>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- TAB 2: MODEL HUB -->
+    <div class="tab-content" id="tab-hub">
+      <div class="view-container">
+        <div>
+          <div class="view-title">🔍 Model Hub & Discovery</div>
+          <div class="view-subtitle">Browse online models, check hardware compatibility, and download with 1-Click.</div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <input type="text" id="hub-search" placeholder="Search models (e.g. gguf, nvidia, vision, audio, whisper)..." style="max-width: 360px;">
+          <button class="btn-action" onclick="loadHubModels()">Search</button>
+          <button class="btn-action" style="background: rgba(168,85,247,0.2); border: 1px solid #a855f7;" onclick="filterHub('gguf')">💜 GGUF 4-Bit</button>
+          <button class="btn-action" style="background: rgba(34,197,94,0.2); border: 1px solid #22c55e;" onclick="filterHub('nvidia')">💚 NVIDIA Open Models</button>
+          <button class="btn-action" style="background: rgba(59,130,246,0.2); border: 1px solid #3b82f6;" onclick="filterHub('vision')">👁️ Vision Models</button>
+          <button class="btn-action" style="background: rgba(245,158,11,0.2); border: 1px solid #f59e0b;" onclick="filterHub('audio')">🎙️ Audio Models</button>
+        </div>
+        <div class="cards-grid" id="hub-grid">
+          <div>Loading discovery catalog...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: INSTALLED MODELS -->
+    <div class="tab-content" id="tab-installed">
+      <div class="view-container">
+        <div>
+          <div class="view-title">📦 Installed Local Models</div>
+          <div class="view-subtitle">Manage models stored on your local disk.</div>
+        </div>
+        <div class="cards-grid" id="installed-grid">
+          <div>Loading installed models...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: HARDWARE DOCTOR -->
+    <div class="tab-content" id="tab-doctor">
+      <div class="view-container">
+        <div>
+          <div class="view-title">🩺 Hardware Diagnostic Doctor</div>
+          <div class="view-subtitle">Hardware specification report and safe parameter capacity thresholds.</div>
+        </div>
+        <div class="cards-grid" id="doctor-grid">
+          <div>Loading hardware diagnostics...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: SETTINGS & AUTH -->
+    <div class="tab-content" id="tab-settings">
+      <div class="view-container">
+        <div>
+          <div class="view-title">⚙️ Settings & Hugging Face Authentication</div>
+          <div class="view-subtitle">Manage API tokens for Gated Models and saved memory sessions.</div>
+        </div>
+        <div class="card" style="max-width: 500px;">
+          <div class="card-title">Hugging Face User Access Token (`aq login`)</div>
+          <div class="card-desc">Required to download Gated models like Meta Llama 3.2.</div>
+          <div class="form-group" style="margin-top: 10px;">
+            <input type="password" id="hf-token-input" placeholder="hf_xxxxxxxxxxxxxxxxxxxx">
+            <button class="btn-action" style="margin-top: 8px;" onclick="saveToken()">Save Token</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="view-title" style="font-size: 1.1rem; margin-bottom: 8px;">Saved Conversation Memories</div>
+          <div class="cards-grid" id="memory-grid">
+            <div>Loading memories...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modelSelect = document.getElementById('model-select');
+    const systemPromptInput = document.getElementById('system-prompt');
+    const chatMessages = document.getElementById('chat-messages');
+    const userInput = document.getElementById('user-input');
+    const btnSend = document.getElementById('btn-send');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const hwBadge = document.getElementById('hw-badge');
+    const hubGrid = document.getElementById('hub-grid');
+    const installedGrid = document.getElementById('installed-grid');
+    const doctorGrid = document.getElementById('doctor-grid');
+    const memoryGrid = document.getElementById('memory-grid');
+    const hubSearch = document.getElementById('hub-search');
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+
+      if (tabName === 'hub') loadHubModels();
+      if (tabName === 'installed') loadInstalledModelsView();
+      if (tabName === 'doctor') loadDoctorView();
+      if (tabName === 'settings') loadSettingsView();
+    }
+
+    async function init() {
+      await loadModels();
+      await loadHardwareDoctor();
+    }
+
+    let previousModel = '';
+    let pendingModelSwitch = null;
+
+    async function loadSessionHistory(modelName) {
+      if (!modelName) return;
+      try {
+        const res = await fetch(`/api/memory/session?name=${encodeURIComponent(modelName)}`);
+        const data = await res.json();
+        chatMessages.innerHTML = `
+          <div class="message assistant">
+            <div class="message-meta">AQRuntime Assistant</div>
+            <div>Welcome to AQRuntime Control Center! Active Model: <b>${modelName}</b>.</div>
+          </div>
+        `;
+        if (data.messages && data.messages.length > 0) {
+          data.messages.forEach(m => {
+            if (m.role === 'user' || m.role === 'assistant') {
+              appendMessage(m.role, m.content);
+            }
+          });
+        }
+      } catch (err) {}
+    }
+
+    async function startNewChat() {
+      const selectedModel = modelSelect.value;
+      if (!selectedModel) return;
+      if (confirm(`Mulai percakapan baru untuk model ${selectedModel}? Memori percakapan sebelumnya akan dibersihkan.`)) {
+        await fetch('/api/memory/clear', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session: selectedModel })
+        });
+        await loadSessionHistory(selectedModel);
+      }
+    }
+
+    function onModelSelectChange() {
+      const newModel = modelSelect.value;
+      if (!newModel || newModel === previousModel) return;
+      const currentMessagesCount = chatMessages.querySelectorAll('.message').length;
+      if (previousModel && currentMessagesCount > 1) {
+        pendingModelSwitch = { source: previousModel, target: newModel };
+        document.getElementById('switch-modal-title').textContent = `Pindah Model: ${previousModel} ➔ ${newModel}`;
+        document.getElementById('model-switch-modal').style.display = 'flex';
+      } else {
+        previousModel = newModel;
+        loadSessionHistory(newModel);
+      }
+    }
+
+    async function executeTransferTopic() {
+      if (!pendingModelSwitch) return;
+      document.getElementById('model-switch-modal').style.display = 'none';
+      const { source, target } = pendingModelSwitch;
+      try {
+        await fetch('/api/memory/copy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source, target })
+        });
+      } catch (err) {}
+      previousModel = target;
+      await loadSessionHistory(target);
+      pendingModelSwitch = null;
+    }
+
+    async function executeStartFreshChat() {
+      if (!pendingModelSwitch) return;
+      document.getElementById('model-switch-modal').style.display = 'none';
+      const { target } = pendingModelSwitch;
+      previousModel = target;
+      await loadSessionHistory(target);
+      pendingModelSwitch = null;
+    }
+
+    async function loadModels() {
+      try {
+        const res = await fetch('/v1/models');
+        const data = await res.json();
+        modelSelect.innerHTML = '';
+        if (!data.data || data.data.length === 0) {
+          modelSelect.innerHTML = '<option value="">No installed models</option>';
+          return;
+        }
+        data.data.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.textContent = m.id;
+          modelSelect.appendChild(opt);
+        });
+        modelSelect.onchange = onModelSelectChange;
+        if (modelSelect.value) {
+          previousModel = modelSelect.value;
+          await loadSessionHistory(previousModel);
+        }
+      } catch (err) {
+        modelSelect.innerHTML = '<option value="">Error loading models</option>';
+      }
+    }
+
+    async function loadHardwareDoctor() {
+      try {
+        const res = await fetch('/api/doctor');
+        const data = await res.json();
+        if (data.hardware) {
+          hwBadge.textContent = `RAM: ${data.hardware.total_ram_gb.toFixed(1)} GB (${data.status})`;
+        }
+      } catch (err) {}
+    }
+
+    let attachedFileContent = null;
+    let attachedFileName = null;
+    let attachedImageBase64 = null;
+    let attachedImageName = null;
+
+    function handleImageSelected(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      attachedImageName = file.name;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        attachedImageBase64 = e.target.result;
+        document.getElementById('image-preview-thumb').src = e.target.result;
+        document.getElementById('image-attachment-name').innerText = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        document.getElementById('image-attachment-preview').style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearImageAttachment() {
+      attachedImageBase64 = null;
+      attachedImageName = null;
+      document.getElementById('image-input').value = '';
+      document.getElementById('image-attachment-preview').style.display = 'none';
+    }
+
+    function handleFileSelected(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (['docx', 'doc', 'pdf', 'zip', 'exe', 'png', 'jpg', 'jpeg', 'xlsx'].includes(ext)) {
+        alert(`⚠️ Berkas '${file.name}' adalah berkas biner/dokumen terkompresi (.${ext}).\n\nFitur attachment saat ini dirancang untuk membaca Berkas Teks Polos (.txt, .md, .py, .json, .csv, .log).\n\n👉 Solusi: Silakan simpan berkas Word Anda sebagai 'Plain Text (.txt)' atau 'Markdown (.md)' sebelum melampirkannya.`);
+        clearFileAttachment();
+        return;
+      }
+
+      attachedFileName = file.name;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        let text = e.target.result || '';
+        if (text.startsWith('PK\x03\x04') || /[\x00-\x08\x0E-\x1F]/.test(text.substring(0, 100))) {
+          alert(`⚠️ Berkas '${file.name}' terdeteksi berisi data biner terkompresi.\n\nSilakan gunakan berkas Teks Polos (.txt, .md, .py, .json, .csv, .log).`);
+          clearFileAttachment();
+          return;
+        }
+
+        const MAX_ATTACHMENT_CHARS = 4500;
+        if (text.length > MAX_ATTACHMENT_CHARS) {
+          text = text.substring(0, MAX_ATTACHMENT_CHARS) + `\n\n[⚠️ Catatan: Lampiran dipotong otomatis pada ${MAX_ATTACHMENT_CHARS} karakter agar aman dari batas Context Window 2048 token]`;
+        }
+
+        attachedFileContent = text;
+        document.getElementById('file-attachment-name').innerText = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        document.getElementById('file-attachment-preview').style.display = 'block';
+      };
+      reader.readAsText(file);
+    }
+
+    function clearFileAttachment() {
+      attachedFileContent = null;
+      attachedFileName = null;
+      document.getElementById('file-input').value = '';
+      document.getElementById('file-attachment-preview').style.display = 'none';
+    }
+
+    function applyPersonaPreset() {
+      const preset = document.getElementById('persona-preset').value;
+      const sysArea = document.getElementById('system-prompt');
+      const presets = {
+        default: "You are AQRuntime Assistant. Be helpful, truthful, concise, and conversational. Answer directly in the user's language.",
+        python: "You are an expert Python Software Engineer. Write clean, modular, highly-performant Python 3.12 code with complete type hints and docstrings.",
+        translator: "You are a professional linguist and translator into natural, fluent Bahasa Indonesia. Translate texts accurately while maintaining original tone.",
+        editor: "You are a professional technical editor. Refine, polish, and structure technical manuscripts for high clarity and conciseness.",
+        scholar: "You are a distinguished research scholar in physics, computer science, and AI runtime engineering."
+      };
+      sysArea.value = presets[preset] || presets.default;
+    }
+
+    function exportChatMarkdown() {
+      const messages = document.querySelectorAll('#chat-messages .message');
+      if (!messages || messages.length === 0) return;
+      let md = `# AQRuntime Chat Export - ${new Date().toLocaleString()}\n\n`;
+      messages.forEach(msg => {
+        const meta = msg.querySelector('.message-meta') ? msg.querySelector('.message-meta').innerText : 'Role';
+        const text = msg.innerText.replace(meta, '').trim();
+        md += `### ${meta}\n${text}\n\n---\n\n`;
+      });
+      const blob = new Blob([md], { type: 'text/markdown' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `AQRuntime_Chat_${Date.now()}.md`;
+      a.click();
+    }
+
+    let isRecording = false;
+    let speechRecognition = null;
+
+    function toggleVoiceRecording() {
+      const btnMic = document.getElementById('btn-mic');
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        alert("⚠️ Peramban Anda tidak mendukung Web Speech Recognition API. Gunakan Chrome, Edge, atau Safari modern.");
+        return;
+      }
+
+      if (!isRecording) {
+        speechRecognition = new SpeechRecognition();
+        speechRecognition.lang = 'id-ID';
+        speechRecognition.interimResults = true;
+        speechRecognition.continuous = false;
+
+        speechRecognition.onstart = function() {
+          isRecording = true;
+          btnMic.innerText = '🔴 Recording...';
+          btnMic.style.background = 'rgba(239, 68, 68, 0.8)';
+          btnMic.style.color = '#ffffff';
+        };
+
+        speechRecognition.onresult = function(event) {
+          const transcript = Array.from(event.results)
+            .map(result => result[0].transcript)
+            .join('');
+          document.getElementById('user-input').value = transcript;
+        };
+
+        speechRecognition.onerror = function(event) {
+          stopVoiceRecording();
+        };
+
+        speechRecognition.onend = function() {
+          stopVoiceRecording();
+        };
+
+        speechRecognition.start();
+      } else {
+        stopVoiceRecording();
+      }
+    }
+
+    function stopVoiceRecording() {
+      isRecording = false;
+      const btnMic = document.getElementById('btn-mic');
+      if (btnMic) {
+        btnMic.innerText = '🎙️';
+        btnMic.style.background = 'rgba(239,68,68,0.2)';
+        btnMic.style.color = '';
+      }
+      if (speechRecognition) {
+        try { speechRecognition.stop(); } catch(e){}
+      }
+    }
+
+    function readAloudText(text) {
+      if (!('speechSynthesis' in window)) {
+        alert("⚠️ Peramban Anda tidak mendukung Web Speech Synthesis.");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'id-ID';
+      utterance.rate = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function appendMessage(role, text, telemetry = null, imageBase64 = null) {
+      const msg = document.createElement('div');
+      msg.className = `message ${role}`;
+      let badgeHtml = '';
+      let ttsBtnHtml = '';
+      if (role === 'assistant') {
+        const cleanText = text.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+        ttsBtnHtml = `<button onclick="readAloudText('${cleanText}')" style="background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); border-radius: 4px; color: #fbbf24; font-size: 0.72rem; padding: 2px 8px; cursor: pointer;" title="Read response aloud with voice">🔊 Read Aloud</button>`;
+      }
+      if (role === 'assistant' && telemetry) {
+        badgeHtml = `<div style="font-size: 0.72rem; margin-top: 8px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.08); color: var(--primary-light); display: flex; align-items: center; justify-content: space-between;"><span>⚡ ${telemetry.tokens_per_second || 0} tok/s &bull; ${telemetry.latency_seconds || 0}s latency &bull; ~2.1 GB RAM</span>${ttsBtnHtml}</div>`;
+      } else if (role === 'assistant') {
+        badgeHtml = `<div style="margin-top: 8px; display: flex; justify-content: flex-end;">${ttsBtnHtml}</div>`;
+      }
+      let imgHtml = '';
+      if (imageBase64) {
+        imgHtml = `<div style="margin-bottom: 8px;"><img src="${imageBase64}" style="max-height: 160px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);"></div>`;
+      }
+      msg.innerHTML = `
+        <div class="message-meta">${role === 'user' ? 'You' : 'AQRuntime Assistant'}</div>
+        ${imgHtml}
+        <div>${text.replace(/\n/g, '<br>')}</div>
+        ${badgeHtml}
+      `;
+      chatMessages.appendChild(msg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendMessage() {
+      let text = userInput.value.trim();
+      const selectedModel = modelSelect.value;
+      if (!text && !attachedFileContent && !attachedImageBase64) return;
+      if (!selectedModel) return;
+
+      const sendingImage = attachedImageBase64;
+      if (attachedFileContent) {
+        text = `[Attached File: ${attachedFileName}]\n\`\`\`\n${attachedFileContent}\n\`\`\`\n\n${text}`;
+      }
+
+      appendMessage('user', text || "Jelaskan gambar ini", null, sendingImage);
+      userInput.value = '';
+      clearFileAttachment();
+      clearImageAttachment();
+      btnSend.disabled = true;
+      typingIndicator.style.display = 'block';
+
+      let msgContentPayload = text;
+      if (sendingImage) {
+        msgContentPayload = [
+          { type: "text", text: text || "Jelaskan gambar ini" },
+          { type: "image_url", image_url: { url: sendingImage } }
+        ];
+      }
+
+      const maxTokens = parseInt(document.getElementById('max-tokens-slider').value) || 512;
+
+      try {
+        const res = await fetch('/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: selectedModel,
+            runtime: document.getElementById('runtime-select').value,
+            max_tokens: maxTokens,
+            messages: [{ role: 'user', content: msgContentPayload }]
+          })
+        });
+        const data = await res.json();
+        typingIndicator.style.display = 'none';
+        btnSend.disabled = false;
+
+        if (data.choices && data.choices[0]) {
+          appendMessage('assistant', data.choices[0].message.content, data.performance);
+        } else if (data.error) {
+          appendMessage('assistant', `[Error]: ${data.error}`);
+        }
+      } catch (err) {
+        typingIndicator.style.display = 'none';
+        btnSend.disabled = false;
+        appendMessage('assistant', `[Error]: Failed to communicate with AQRuntime API.`);
+      }
+    }
+
+    async function loadHubModels() {
+      const query = hubSearch.value.trim();
+      hubGrid.innerHTML = '<div>Fetching models...</div>';
+      try {
+        const res = await fetch(`/api/discover?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        hubGrid.innerHTML = '';
+        if (!data.models || data.models.length === 0) {
+          hubGrid.innerHTML = '<div>No models found.</div>';
+          return;
+        }
+        data.models.forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          const isGguof = m.format === 'gguf' || m.repo_id.toLowerCase().includes('gguf');
+          let quantTag = '[GGUF Q4_K_M]';
+          if (m.repo_id.toLowerCase().includes('q5_k_m')) quantTag = '[GGUF Q5_K_M]';
+          else if (m.repo_id.toLowerCase().includes('q8_0')) quantTag = '[GGUF Q8_0]';
+          else if (m.format === 'vision') quantTag = '[VISION FP16]';
+          else if (m.format === 'audio') quantTag = '[AUDIO FP16]';
+          const badgeGguof = isGguof ? `<span class="badge" style="color: #c084fc;">${quantTag}</span>` : (m.format === 'vision' ? `<span class="badge" style="color: #3b82f6;">${quantTag}</span>` : (m.format === 'audio' ? `<span class="badge" style="color: #f59e0b;">${quantTag}</span>` : ''));
+          const badgeGated = m.is_gated ? '<span class="badge" style="color: #f43f5e;">[GATED]</span>' : '';
+          card.innerHTML = `
+            <div class="card-title">${m.name} ${badgeGguof} ${badgeGated}</div>
+            <div class="card-desc">${m.description}</div>
+            <div class="card-meta">
+              <span>${m.param_size_b}B params | RAM: ~${m.est_ram_gb} GB</span>
+              <button class="btn-action" onclick="pullModel('${m.repo_id}')">1-Click Pull</button>
+            </div>
+          `;
+          hubGrid.appendChild(card);
+        });
+      } catch (err) {
+        hubGrid.innerHTML = '<div>Failed to load hub catalog.</div>';
+      }
+    }
+
+    let activeInspectRepo = null;
+
+    async function pullModel(repoId) {
+      activeInspectRepo = repoId;
+      try {
+        const res = await fetch('/api/pull/inspect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repository: repoId })
+        });
+        const data = await res.json();
+        
+        if (data.is_installed) {
+          alert(`Model '${data.model_name}' (repository: ${repoId}) is ALREADY fully installed 100% and ready to use!`);
+          return;
+        }
+
+        if (data.is_partial) {
+          document.getElementById('modal-repo-title').textContent = `Partial Download Detected for ${repoId}`;
+          document.getElementById('modal-repo-subtitle').textContent = `Found ${data.cached_gb} GB cached on local disk (~${data.percentage}% complete). Choose how to proceed:`;
+          document.getElementById('modal-progress-fill').style.width = `${data.percentage}%`;
+          document.getElementById('smart-pull-modal').style.display = 'flex';
+          return;
+        }
+
+        if (confirm(`Start download for '${repoId}'?`)) {
+          executeResumePull();
+        }
+      } catch (err) {
+        alert('Failed to inspect model state.');
+      }
+    }
+
+    function closeSmartModal() {
+      document.getElementById('smart-pull-modal').style.display = 'none';
+    }
+
+    function filterHub(keyword) {
+      hubSearch.value = keyword;
+      loadHubModels();
+    }
+
+    async function executeResumePull() {
+      closeSmartModal();
+      if (!activeInspectRepo) return;
+      try {
+        const res = await fetch('/api/pull', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repository: activeInspectRepo })
+        });
+        if (res.status === 202 || res.ok) {
+          alert(`⏳ Pengunduhan Sedang Berjalan di Latar Belakang!\n\nProgres detail dapat dipantau di bilah kemajuan Web GUI ini atau di jendela Command Line / Terminal Anda.`);
+          pollPullStatus();
+        } else {
+          alert('Failed to start download.');
+        }
+      } catch (err) {
+        alert('Failed to connect to server.');
+      }
+    }
+
+    async function executeResetPull() {
+      if (!activeInspectRepo) return;
+      if (!confirm(`Apakah Anda yakin ingin MENGHAPUS CACHE data yang sudah ada dan mengunduh ulang '${activeInspectRepo}' dari 0%?`)) return;
+      closeSmartModal();
+      try {
+        const res = await fetch('/api/pull/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repository: activeInspectRepo })
+        });
+        if (res.status === 202 || res.ok) {
+          alert(`⏳ Pengunduhan Reset Sedang Berjalan di Latar Belakang!\n\nProgres detail dapat dipantau di bilah kemajuan Web GUI ini atau di jendela Command Line / Terminal Anda.`);
+          pollPullStatus();
+        } else {
+          alert('Failed to start reset download.');
+        }
+      } catch (err) {
+        alert('Failed to connect to server.');
+      }
+    }
+
+    let wakeLockSentinel = null;
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator && !wakeLockSentinel) {
+          wakeLockSentinel = await navigator.wakeLock.request('screen');
+        }
+      } catch (e) {}
+    }
+
+    function releaseWakeLock() {
+      if (wakeLockSentinel) {
+        wakeLockSentinel.release().catch(() => {});
+        wakeLockSentinel = null;
+      }
+    }
+
+    let pollTimer = null;
+    function pollPullStatus() {
+      if (pollTimer) clearInterval(pollTimer);
+      requestWakeLock();
+      pollTimer = setInterval(async () => {
+        try {
+          const res = await fetch('/api/pull/status');
+          const data = await res.json();
+          if (data.status === 'downloading') {
+            const lockBadge = data.sleep_lock_active ? ' 🛡️ Sleep Lock Active' : '';
+            hwBadge.textContent = `Downloading ${data.repository}...${lockBadge}`;
+          } else if (data.status === 'completed') {
+            clearInterval(pollTimer);
+            releaseWakeLock();
+            hwBadge.textContent = `RAM: Ready`;
+            alert(`🎉 Model '${data.model}' BERHASIL DIUNDUH 100%!\n\nModel telah ditambahkan ke daftar terinstal dan otomatis diaktifkan untuk obrolan.`);
+            await loadModels();
+            await loadHardwareDoctor();
+            if (data.model) {
+              modelSelect.value = data.model;
+              previousModel = data.model;
+              await loadSessionHistory(data.model);
+              // AUTO SWITCH TO CHAT & INFER TAB
+              document.querySelectorAll('.tab-btn')[0].click();
+            }
+          } else if (data.status === 'failed') {
+            clearInterval(pollTimer);
+            releaseWakeLock();
+            hwBadge.textContent = `RAM: Ready`;
+            alert(`Download failed: ${data.error}`);
+          }
+        } catch (err) {}
+      }, 2000);
+    }
+
+    async function loadInstalledModelsView() {
+      installedGrid.innerHTML = '<div>Loading installed models...</div>';
+      try {
+        const res = await fetch('/v1/models');
+        const data = await res.json();
+        installedGrid.innerHTML = '';
+        if (!data.data || data.data.length === 0) {
+          installedGrid.innerHTML = '<div>No models installed locally.</div>';
+          return;
+        }
+        data.data.forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="card-title">${m.id}</div>
+            <div class="card-desc">Locally stored AI model weights.</div>
+            <div class="card-meta">
+              <span>Installed</span>
+              <button class="btn-action btn-danger" onclick="removeModel('${m.id}')">Delete Model</button>
+            </div>
+          `;
+          installedGrid.appendChild(card);
+        });
+      } catch (err) {}
+    }
+
+    async function removeModel(modelId) {
+      if (!confirm(`Delete model '${modelId}' from local disk?`)) return;
+      try {
+        const res = await fetch('/api/remove', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: modelId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`Model '${modelId}' deleted.`);
+          await loadModels();
+          await loadInstalledModelsView();
+        }
+      } catch (err) {}
+    }
+
+    async function loadDoctorView() {
+      doctorGrid.innerHTML = '<div>Loading diagnostic report...</div>';
+      try {
+        const res = await fetch('/api/doctor');
+        const data = await res.json();
+        const hw = data.hardware;
+        doctorGrid.innerHTML = `
+          <div class="card">
+            <div class="card-title">System Hardware</div>
+            <div class="card-desc">
+              OS: ${hw.os}<br>
+              CPU: ${hw.cpu} (${hw.cpu_cores} cores)<br>
+              RAM Total: ${hw.total_ram_gb.toFixed(1)} GB<br>
+              RAM Available: ${hw.available_ram_gb.toFixed(1)} GB
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Parameter Capacity Limits</div>
+            <div class="card-desc">
+              Safe FP16 Parameter Limit: <= <strong>${hw.max_safe_param_b}B</strong> params<br>
+              Safe GGUF 4-Bit Parameter Limit: <= <strong style="color: #34d399;">${hw.max_safe_gguf_param_b}B</strong> params!
+            </div>
+          </div>
+        `;
+      } catch (err) {}
+    }
+
+    async function loadSettingsView() {
+      try {
+        const res = await fetch('/api/memory');
+        const sessions = await res.json();
+        memoryGrid.innerHTML = '';
+        if (sessions.length === 0) {
+          memoryGrid.innerHTML = '<div>No saved memory sessions.</div>';
+          return;
+        }
+        sessions.forEach(s => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="card-title">${s.name}</div>
+            <div class="card-desc">${s.turns} turns saved in local memory.</div>
+            <div class="card-meta">
+              <button class="btn-action" onclick="exportMemory('${s.name}')">Export MD</button>
+              <button class="btn-action btn-danger" onclick="clearMemory('${s.name}')">Clear Memory</button>
+            </div>
+          `;
+          memoryGrid.appendChild(card);
+        });
+      } catch (err) {}
+    }
+
+    async function saveToken() {
+      const token = document.getElementById('hf-token-input').value.trim();
+      if (!token) return;
+      await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      alert('Hugging Face Access Token saved successfully!');
+    }
+
+    async function clearMemory(sessionName) {
+      if (!confirm(`Clear memory for '${sessionName}'?`)) return;
+      await fetch('/api/memory/clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session: sessionName })
+      });
+      await loadSettingsView();
+    }
+
+    async function exportMemory(sessionName) {
+      const res = await fetch('/api/memory/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session: sessionName })
+      });
+      const data = await res.json();
+      alert(`Exported memory to: ${data.file}`);
+    }
+
+    btnSend.addEventListener('click', sendMessage);
+    userInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    init();
+  </script>
+  <!-- SMART RESUME & RESET MODAL -->
+  <div id="smart-pull-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 999; align-items: center; justify-content: center;">
+    <div class="card" style="width: 520px; max-width: 90%; background: #0f172a; border: 1px solid var(--glass-border); padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
+      <div class="card-title" id="modal-repo-title" style="font-size: 1.15rem; color: #a855f7;">Partial Download Detected</div>
+      <div class="card-desc" id="modal-repo-subtitle" style="margin-top: 6px; font-size: 0.9rem;">Cached bytes found on local disk.</div>
+      <div style="width: 100%; background: rgba(255,255,255,0.1); border-radius: 10px; height: 14px; overflow: hidden; margin: 16px 0;">
+        <div id="modal-progress-fill" style="width: 70%; height: 100%; background: var(--accent-gradient); transition: width 0.3s;"></div>
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 18px; justify-content: flex-end;">
+        <button class="btn-action" style="background: rgba(255,255,255,0.1);" onclick="closeSmartModal()">Batal</button>
+        <button class="btn-action btn-danger" onclick="executeResetPull()">🔄 Reset & Unduh dari Awal</button>
+        <button class="btn-action" style="background: var(--accent-gradient); color: white;" onclick="executeResumePull()">▶️ Lanjutkan Pengunduhan (Resume)</button>
+      </div>
+    </div>
+  <!-- MODEL SWITCH MEMORY MODAL -->
+  <div id="model-switch-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 999; align-items: center; justify-content: center;">
+    <div class="card" style="width: 520px; max-width: 90%; background: #0f172a; border: 1px solid var(--glass-border); padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
+      <div class="card-title" id="switch-modal-title" style="font-size: 1.15rem; color: #a855f7;">Model Switched</div>
+      <div class="card-desc" id="switch-modal-subtitle" style="margin-top: 6px; font-size: 0.9rem;">Pilih bagaimana memori percakapan akan ditangani untuk model baru:</div>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 18px;">
+        <button class="btn-action" style="background: var(--accent-gradient); color: white; padding: 12px; justify-content: center;" onclick="executeTransferTopic()">🔀 Transfer Topik Saat Ini ke Model Baru</button>
+        <button class="btn-action" style="background: rgba(255,255,255,0.1); color: white; padding: 12px; justify-content: center;" onclick="executeStartFreshChat()">✨ Mulai Percakapan Baru (Reset Screen)</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v2.4
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v2.4 – Documentation Baseline
+
+Target Version: PoC v2.4
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v2.4 introduces:
+- Explicit `aq help` CLI Command.
+- Dynamic Max Output Tokens Control (`64` to `8192` tokens).
+- Quantization Precision Level Badges (`Q4_K_M`, `Q5_K_M`, `Q8_0`, `FP16`).
+- Full Offline Mode Verification.

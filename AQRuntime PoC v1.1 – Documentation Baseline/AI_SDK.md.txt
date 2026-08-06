@@ -1,0 +1,15 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v1.1
+
+---
+
+# 1. CLI & API Capabilities
+
+| Feature | Description |
+|---|---|
+| Async Download Engine | Non-blocking background model download |
+| `GET /api/pull/status` | Polling endpoint for active download status |
+| Download Resume Guarantee | HTTP Range Requests resume existing cached weights |

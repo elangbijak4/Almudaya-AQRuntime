@@ -1,0 +1,14 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v0.6
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_preinstall_check_pass`: Verifies hardware detector returns PASS and points out `TinyLlama/TinyLlama-1.1B-Chat-v1.0` on supported specs.
+- `test_estimate_download_size`: Verifies calculation of repository download sizes.
+- `test_pull_confirmation_prompt_cancel`: Verifies `aq pull` aborts when user enters `N`.
+- `test_pull_yes_flag_bypasses_prompt`: Verifies `aq pull --yes` proceeds without interactive confirmation prompt.

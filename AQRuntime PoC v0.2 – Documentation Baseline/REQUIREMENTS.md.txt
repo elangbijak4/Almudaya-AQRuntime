@@ -1,0 +1,41 @@
+# REQUIREMENTS.md
+
+# AQRuntime Software Requirements Specification
+
+Version: PoC v0.2
+
+---
+
+# 1. Introduction
+
+## 1.1 Purpose
+This document defines the functional and non-functional requirements of AQRuntime Version PoC v0.2.
+
+## 1.2 Scope
+AQRuntime PoC v0.2 expands PoC v0.1 to support collision-free multi-model local storage, memory-efficient model loading on 16 GB RAM devices, and improved CLI error handling.
+
+---
+
+# 2. Functional Requirements
+
+- FR-001: Download AI Model from Hugging Face repository.
+- FR-002: Store Model in local storage using sanitized full repository identifier (`owner-repository`).
+- FR-003: List installed models safely without folder name collisions.
+- FR-004: Load AI Model into memory using RAM-optimized parameters (`low_cpu_mem_usage`, float16/bfloat16 when appropriate).
+- FR-005: Interactive Inference execution with multi-turn conversation context.
+- FR-006: User Prompt input via CLI.
+- FR-007: Model Response generation with chat template formatting.
+- FR-008: Exit Session when requested.
+- FR-009: Remove Model by full key or alias name.
+- FR-010: Version Information display.
+- FR-011: Multi-model Support for models from identical repository owners.
+
+---
+
+# 3. Non-Functional Requirements
+
+- NFR-001: Execute on personal computer / laptop (Windows, Linux, macOS) with 16 GB RAM.
+- NFR-002: Command Line Interface operation.
+- NFR-003: Local storage persistence.
+- NFR-004: Offline inference after initial model download.
+- NFR-005: Multi-model storage isolation.

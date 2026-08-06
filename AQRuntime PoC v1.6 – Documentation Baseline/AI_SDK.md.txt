@@ -1,0 +1,12 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v1.6
+
+---
+
+# 1. API Endpoints
+
+- OpenAI Compatible REST API `/v1/chat/completions` with GATED error diagnostics.
+- Catalog Discovery `/api/discover?q=nvidia`.

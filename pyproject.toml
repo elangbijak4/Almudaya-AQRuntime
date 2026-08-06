@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aqruntime"
+version = "0.1.0"
+description = "AQRuntime Proof of Concept"
+requires-python = ">=3.10"
+dependencies = [
+    "huggingface_hub>=0.20",
+    "PyYAML>=6.0",
+    "torch>=2.0",
+    "transformers>=4.36",
+    "typer>=0.9",
+]
+
+[project.scripts]
+aq = "aqruntime.cli.app:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

@@ -1,0 +1,16 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v0.2
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_tc_001_version`: Verifies version output corresponds to `0.2.0`.
+- `test_tc_002_to_tc_003_download_and_list`: Verifies multi-model download and listing under sanitized directory names without collisions.
+- `test_tc_008_to_tc_009_remove_and_empty_list`: Verifies model removal.
+- `test_repository_name_sanitization`: Verifies full repo `owner/repo` sanitization to `owner-repo`.
+- `test_alias_resolution`: Verifies resolution of legacy/alias model names.
+- `test_chat_template`: Verifies chat template formatting and fallback logic.

@@ -1,0 +1,13 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v0.8
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_ui_route`: Verifies `GET /ui` returns 200 OK and serves index.html.
+- `test_api_doctor_route`: Verifies `GET /api/doctor` returns hardware diagnostic JSON.
+- `test_api_memory_routes`: Verifies `GET /api/memory` returns memory session list.

@@ -1,0 +1,11 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v2.4
+
+---
+
+# 1. Output Tokens Architecture
+
+- `max_tokens`: Dynamic token limit parameter passed directly to `llama-cpp-python` and PyTorch generation loops.

@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v1.1
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v1.1 – Documentation Baseline
+
+Target Version: PoC v1.1
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v1.1 introduces:
+- Async Background Model Download Engine.
+- Live progress polling (`GET /api/pull/status`).
+- Download resume quota protection guarantee.
+- Real-time Progress Modal in Web GUI.

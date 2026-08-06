@@ -1,0 +1,19 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v1.2
+
+---
+
+# 1. Smart Download Inspection & Reset Engine (`src/aqruntime/model/manager.py`)
+
+- `inspect_download_state(repository)`:
+  - Returns `{"is_installed": bool, "is_partial": bool, "cached_bytes": int, "total_bytes": int, "percentage": float}`.
+- `reset_cache_and_pull(repository, token)`:
+  - Removes partial cache in `~/.cache/huggingface/hub/` and target destination, then launches fresh download thread.
+
+# 2. REST API Endpoints
+
+- `POST /api/pull/inspect`: Returns inspection JSON object.
+- `POST /api/pull/reset`: Body `{"repository": "owner/repo"}` -> Triggers reset and download thread.

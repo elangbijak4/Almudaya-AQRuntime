@@ -1,0 +1,16 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v1.1
+
+---
+
+# 1. Async Background Download Architecture
+
+- `ModelManager`:
+  - `start_background_pull(repository, token)` spawns a Python daemon thread.
+  - Keeps global state `_download_status`: `{"status": "idle"|"downloading"|"completed"|"failed", "repository": str, "error": str}`.
+- REST API:
+  - `POST /api/pull`: Triggers `start_background_pull` and returns 202 Accepted.
+  - `GET /api/pull/status`: Returns JSON status object.

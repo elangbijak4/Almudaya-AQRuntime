@@ -1,0 +1,37 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v1.4
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v1.4 – Documentation Baseline
+
+Target Version: PoC v1.4
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v1.4 introduces:
+- GGUF Dual Inference Routing (`_generate_gguf`).
+- Native GGUF text generation for `GGUFModelWrapper` and `SimulatedGGUFModel`.
+- Fixes PyTorch `self.tokenizer(...)` TypeError crashes on GGUF models.

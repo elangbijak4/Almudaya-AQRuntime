@@ -1,0 +1,16 @@
+# REQUIREMENTS.md
+
+# AQRuntime Software Requirements Specification
+
+Version: PoC v2.3
+
+---
+
+# 1. Functional Requirements
+
+- FR-089: Support `AudioProcessor` to validate audio files (`.wav`, `.mp3`, `.m4a`, `.ogg`) and transcribe speech to text.
+- FR-090: Provide REST API endpoint `POST /api/audio/transcribe`.
+- FR-091: Provide Microphone Voice Input button (`🎙️`) and live recording indicator (`🔴 Recording...`) in Web GUI.
+- FR-092: Provide Text-to-Speech Read Aloud button (`🔊`) on assistant chat bubbles using Web Speech Synthesis API.
+- FR-093: Provide `aq discover audio` query filter and `🎙️ Audio Models` filter button in Model Hub (Tab 2).
+- FR-094: Living Development History file (`docs/Development_History.md`) updated across all evolution cycles.

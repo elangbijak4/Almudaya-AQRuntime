@@ -1,0 +1,12 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v0.7
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_http_server_health_and_models`: Tests GET `/health` and GET `/v1/models` HTTP responses.
+- `test_custom_system_prompt_override`: Verifies custom system prompt is formatted into messages.

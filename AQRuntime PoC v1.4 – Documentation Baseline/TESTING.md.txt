@@ -1,0 +1,11 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v1.4
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_gguf_inference_execution`: Verifies `InferenceEngine.generate()` successfully returns response for GGUF models.

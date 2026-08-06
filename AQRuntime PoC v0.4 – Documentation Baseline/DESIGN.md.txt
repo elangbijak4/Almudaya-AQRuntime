@@ -1,0 +1,35 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v0.4
+
+---
+
+# 1. System Architecture
+
+```
++-------------------------------------------------------+
+|             Command Line Interface (CLI)              |
+|              (src/aqruntime/cli/app.py)               |
++--------------------------+----------------------------+
+                           |
+                           v
++-------------------------------------------------------+
+|                     Runtime Core                      |
+|             (src/aqruntime/runtime/core.py)           |
++------+-------------------+--------------------+-------+
+       |                   |                    |       |
+       v                   v                    v       v
++--------------+    +--------------+    +----------+ +-----------+
+| Model Manager|    |StorageManager|    | Hardware | | Catalog   |
+| (src/model/) |    |(src/storage/)|    | Detector | | Manager   |
++--------------+    +--------------+    +----------+ +-----------+
+```
+
+# 2. Component Design
+
+## Token & Gated Model Handling
+- `RuntimeSettings`: Stores `hf_token` loaded from `config/runtime.yaml` or `HF_TOKEN` environment variable.
+- `ModelManager`: Resolves authentication token and passes it to Hugging Face `snapshot_download`. Catches `GatedRepoError` or 401/403 HTTP errors and formats step-by-step resolution instructions.
+- `CatalogManager`: Inspects Hugging Face model API flags to highlight `[GATED]` models in `aq discover`.

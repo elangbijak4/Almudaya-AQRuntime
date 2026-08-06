@@ -1,0 +1,40 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v1.0
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v1.0 – Documentation Baseline
+
+Target Version: PoC v1.0
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v1.0 introduces:
+- AQRuntime Desktop Control Center Web GUI (`aq ui`).
+- Fix conversation chat scrollability.
+- Visual Model Discovery & 1-Click Pulling (`/api/discover` & `/api/pull`).
+- Installed Model Manager & 1-Click Removal (`/api/remove`).
+- Hardware Doctor Gauges for FP16 vs GGUF 4-Bit limits.
+- HF Access Token manager (`/api/login`).

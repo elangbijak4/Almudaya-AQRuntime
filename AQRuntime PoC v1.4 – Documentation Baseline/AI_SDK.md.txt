@@ -1,0 +1,12 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v1.4
+
+---
+
+# 1. GGUF Model Wrappers
+
+- `GGUFModelWrapper`: Wraps `llama_cpp.Llama` for GGUF 4-bit inference.
+- `SimulatedGGUFModel`: Fallback wrapper for GGUF inference when `llama_cpp` is not installed.

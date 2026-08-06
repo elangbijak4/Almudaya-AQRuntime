@@ -1,0 +1,11 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v1.3
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_power_lock_manager`: Verifies `PowerLockManager` lock acquire and release lifecycle.

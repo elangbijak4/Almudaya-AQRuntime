@@ -1,0 +1,18 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v1.0
+
+---
+
+# 1. CLI & GUI Capabilities
+
+| Command / GUI Tab | Description |
+|---|---|
+| `aq ui` / Desktop Control Center | Launch 5-Tab Web GUI Control Center |
+| Tab 1: Chat & Inference | Interactive Chat REPL & System Persona Editor |
+| Tab 2: Model Hub | Visual Model Discovery & 1-Click Pull |
+| Tab 3: Installed Models | Local Model Cards & 1-Click Delete |
+| Tab 4: Hardware Doctor | RAM Gauges, FP16 vs GGUF 4-Bit Capacity Limits |
+| Tab 5: Settings & Auth | Hugging Face Token Auth (`aq login`) & Memory Manager |

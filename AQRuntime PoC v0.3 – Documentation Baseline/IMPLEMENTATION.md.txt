@@ -1,0 +1,13 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v0.3
+
+---
+
+# 1. Implementation Architecture
+
+- `src/aqruntime/hardware/detector.py`: System RAM & CPU inspection via `psutil` or `sys`/`ctypes` fallback.
+- `src/aqruntime/catalog/manager.py`: Online Hugging Face API fetcher, offline cache manager (`config/catalog_cache.json`), and hardware compatibility filter.
+- `src/aqruntime/cli/app.py`: `aq discover` command handler with interactive console formatting.

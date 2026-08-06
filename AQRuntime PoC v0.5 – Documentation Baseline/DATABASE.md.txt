@@ -1,0 +1,35 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v0.5
+
+---
+
+# 1. Directory Structure
+
+```
+AQRuntime/
+├── models/
+├── config/
+│   ├── runtime.yaml
+│   └── catalog_cache.json
+├── memory/
+│   ├── google-gemma-2-2b-it.json
+│   └── koding-python.json
+└── logs/
+    └── runtime.log
+```
+
+# 2. Memory Session Storage Format (`memory/<session_name>.json`)
+
+```json
+{
+  "session_name": "google-gemma-2-2b-it",
+  "updated_at": "2026-08-05T12:00:00",
+  "messages": [
+    {"role": "user", "content": "My name is Budi."},
+    {"role": "assistant", "content": "Hello Budi! How can I help you today?"}
+  ]
+}
+```

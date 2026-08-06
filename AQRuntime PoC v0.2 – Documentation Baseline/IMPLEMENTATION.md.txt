@@ -1,0 +1,24 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v0.2
+
+---
+
+# 1. Implementation Details
+
+- Python 3.10+
+- Typer CLI framework
+- HuggingFace `snapshot_download` and `transformers`
+- PyTorch CPU inference engine with RAM-efficient options
+- Storage manager with full repository name sanitization and alias fallback
+
+# 2. Key Code Modules
+
+- `src/aqruntime/cli/app.py`: CLI command routing and prompt handling.
+- `src/aqruntime/config/settings.py`: Application path resolution and YAML loader.
+- `src/aqruntime/storage/manager.py`: Path calculation, model listing, deletion, alias matching.
+- `src/aqruntime/model/manager.py`: Downloader and HuggingFace AutoModel loader.
+- `src/aqruntime/runtime/core.py`: Application coordinator and logger.
+- `src/aqruntime/runtime/inference.py`: Chat session context and text generator.

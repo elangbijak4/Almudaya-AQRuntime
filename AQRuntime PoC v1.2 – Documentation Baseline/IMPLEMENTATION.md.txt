@@ -1,0 +1,13 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v1.2
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/model/manager.py`: Inspection and reset engine methods.
+- `src/aqruntime/server/api.py`: Added endpoints `/api/pull/inspect` & `/api/pull/reset`.
+- `src/aqruntime/server/ui/index.html`: Smart Download Resume & Reset Modal in Tab 2 (Model Hub).

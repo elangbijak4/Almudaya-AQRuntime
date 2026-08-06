@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v2.0
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v2.0 – Documentation Baseline
+
+Target Version: PoC v2.0
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v2.0 introduces:
+- Pluggable Execution Provider Engine (`src/aqruntime/runtime/providers/`).
+- Priority Fallback Chain Engine.
+- CLI commands `aq runtime list` and `aq runtime info <provider>`.
+- Web GUI Execution Runtime Selector dropdown.

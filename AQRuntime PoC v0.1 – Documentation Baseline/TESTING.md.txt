@@ -1,0 +1,343 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v0.1
+
+---
+
+# 1. Overview
+
+This document defines the testing procedures for AQRuntime Proof of Concept (PoC) Version 0.1.
+
+The objective is to verify that every functional requirement has been successfully implemented.
+
+---
+
+# 2. Test Environment
+
+Operating System
+
+- Windows
+- Linux
+- macOS
+
+Execution Mode
+
+- Command Line Interface (CLI)
+
+---
+
+# 3. Test Cases
+
+## TC-001 Runtime Version
+
+Objective
+
+Verify runtime version information.
+
+Command
+
+```bash
+aq version
+```
+
+Expected Result
+
+```
+AQRuntime
+Version 0.1.0
+```
+
+Status
+
+PASS
+
+---
+
+## TC-002 Download Model
+
+Objective
+
+Verify model download.
+
+Command
+
+```bash
+aq pull TinyLlama/TinyLlama-1.1B-Chat-v1.0
+```
+
+Expected Result
+
+```
+Downloading model...
+
+Completed.
+```
+
+Status
+
+PASS
+
+---
+
+## TC-003 List Installed Models
+
+Objective
+
+Verify installed model listing.
+
+Command
+
+```bash
+aq list
+```
+
+Expected Result
+
+```
+Installed Models
+
+tinyllama
+```
+
+Status
+
+PASS
+
+---
+
+## TC-004 Run Model
+
+Objective
+
+Verify model loading.
+
+Command
+
+```bash
+aq run tinyllama
+```
+
+Expected Result
+
+```
+AQRuntime>
+```
+
+Status
+
+PASS
+
+---
+
+## TC-005 Interactive Prompt
+
+Objective
+
+Verify prompt processing.
+
+Input
+
+```
+Hello
+```
+
+Expected Result
+
+```
+Model>
+
+Hello!
+How can I help you today?
+```
+
+Status
+
+PASS
+
+---
+
+## TC-006 Multi Prompt
+
+Objective
+
+Verify repeated interaction.
+
+Input
+
+```
+What is AI?
+```
+
+Expected Result
+
+```
+Model>
+
+Artificial Intelligence ...
+```
+
+Status
+
+PASS
+
+---
+
+## TC-007 Exit Runtime
+
+Objective
+
+Verify runtime termination.
+
+Input
+
+```
+exit
+```
+
+Expected Result
+
+Interactive session terminated.
+
+Status
+
+PASS
+
+---
+
+## TC-008 Remove Model
+
+Objective
+
+Verify model removal.
+
+Command
+
+```bash
+aq remove tinyllama
+```
+
+Expected Result
+
+```
+Model removed.
+```
+
+Status
+
+PASS
+
+---
+
+## TC-009 Empty Model List
+
+Objective
+
+Verify model removal.
+
+Command
+
+```bash
+aq list
+```
+
+Expected Result
+
+```
+No installed models.
+```
+
+Status
+
+PASS
+
+---
+
+# 4. Acceptance Testing
+
+AQRuntime PoC v0.1 shall satisfy all functional requirements.
+
+| Requirement | Test Case |
+|-------------|-----------|
+| FR-001 | TC-002 |
+| FR-002 | TC-002 |
+| FR-003 | TC-003 |
+| FR-004 | TC-004 |
+| FR-005 | TC-005 |
+| FR-006 | TC-005 |
+| FR-007 | TC-005 |
+| FR-008 | TC-007 |
+| FR-009 | TC-008 |
+| FR-010 | TC-001 |
+
+---
+
+# 5. Test Sequence
+
+```
+aq version
+
+↓
+
+aq pull
+
+↓
+
+aq list
+
+↓
+
+aq run
+
+↓
+
+Interactive Prompt
+
+↓
+
+exit
+
+↓
+
+aq remove
+
+↓
+
+aq list
+```
+
+---
+
+# 6. Pass Criteria
+
+AQRuntime PoC v0.1 shall be accepted when:
+
+- All test cases pass.
+- All functional requirements are satisfied.
+- Interactive inference operates successfully.
+- Runtime exits normally.
+- No critical runtime errors occur.
+
+---
+
+# 7. Completion Checklist
+
+| Item | Status |
+|------|--------|
+| Runtime Version | □ |
+| Model Download | □ |
+| Local Storage | □ |
+| Model Listing | □ |
+| Model Loading | □ |
+| Interactive Prompt | □ |
+| Model Response | □ |
+| Runtime Exit | □ |
+| Model Removal | □ |
+| Acceptance Test | □ |
+
+---
+
+# 8. Proof of Concept Completed
+
+AQRuntime PoC v0.1 is considered completed after all checklist items have been successfully verified.

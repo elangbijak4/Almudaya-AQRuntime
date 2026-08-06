@@ -1,0 +1,11 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v2.1
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_performance_telemetry`: Verifies generation timing and `tokens_per_second` telemetry calculations.

@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v1.5
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v1.5 – Documentation Baseline
+
+Target Version: PoC v1.5
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v1.5 introduces:
+- Cross-Model Memory Transfer (`copy_session`).
+- Session messages retrieval (`get_session_messages`).
+- API Endpoints (`GET /api/memory/session` & `POST /api/memory/copy`).
+- "➕ New Chat" Button and Model Switch Modal in Web UI.

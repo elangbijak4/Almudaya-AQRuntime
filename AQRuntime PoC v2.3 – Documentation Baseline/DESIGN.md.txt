@@ -1,0 +1,12 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v2.3
+
+---
+
+# 1. Audio & Speech Architecture
+
+- `AudioProcessor`: Validates speech audio payloads and provides speech-to-text transcription algorithms.
+- Speech Synthesis: HTML5 `window.speechSynthesis` API for zero-memory client-side TTS playback.

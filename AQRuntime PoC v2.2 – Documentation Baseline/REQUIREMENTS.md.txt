@@ -1,0 +1,16 @@
+# REQUIREMENTS.md
+
+# AQRuntime Software Requirements Specification
+
+Version: PoC v2.2
+
+---
+
+# 1. Functional Requirements
+
+- FR-083: Support `VisionProcessor` to extract images (Base64 data URLs or binary image buffers).
+- FR-084: Support OpenAI-compatible multimodal `image_url` object array in `/v1/chat/completions`.
+- FR-085: Provide Image Attachment button (`🖼️`) and Live Preview Thumbnail Canvas in Web GUI.
+- FR-086: Provide `aq discover vision` query filter and `👁️ Vision Models` filter button in Model Hub (Tab 2).
+- FR-087: Render image thumbnail inside user chat message bubbles when images are included in prompt.
+- FR-088: Living Development History file (`docs/Development_History.md`) updated across all evolution cycles.

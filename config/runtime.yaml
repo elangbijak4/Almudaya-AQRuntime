@@ -1,0 +1,5 @@
+runtime_version: "2.4.0"
+default_model: null
+model_directory: "models"
+log_directory: "logs"
+hf_token: null

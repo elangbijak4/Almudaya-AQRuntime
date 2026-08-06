@@ -1,0 +1,15 @@
+# REQUIREMENTS.md
+
+# AQRuntime Software Requirements Specification
+
+Version: PoC v2.4
+
+---
+
+# 1. Functional Requirements
+
+- FR-095: Provide explicit `aq help` CLI command displaying formatted manual and parameter descriptions.
+- FR-096: Support dynamic `max_tokens` configuration (64 to 8192 tokens) in `InferenceEngine`, REST API, and Web GUI slider.
+- FR-097: Display Quantization Precision Level badges (`Q4_K_M`, `Q5_K_M`, `Q8_0`, `FP16`) in `aq list`, Model Hub, and Installed models tab.
+- FR-098: Guarantee 100% offline local model execution without internet connection.
+- FR-099: Living Development History file (`docs/Development_History.md`) updated across all evolution cycles.

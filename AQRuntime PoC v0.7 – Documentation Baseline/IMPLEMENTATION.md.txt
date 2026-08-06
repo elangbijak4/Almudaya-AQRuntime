@@ -1,0 +1,13 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v0.7
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/server/api.py`: `AQRuntimeHTTPHandler` and `run_server()` providing REST API endpoints.
+- `src/aqruntime/runtime/inference.py`: Custom system prompt parameter support in `InferenceEngine`.
+- `src/aqruntime/cli/app.py`: Added `aq serve` command and `--system` / `-sys` option in `aq run`.

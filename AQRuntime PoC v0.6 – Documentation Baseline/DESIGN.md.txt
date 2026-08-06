@@ -1,0 +1,21 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v0.6
+
+---
+
+# 1. Hardware Diagnostic Architecture (`src/aqruntime/setup_diagnostic.py`)
+
+- `run_preinstall_check()`: Queries total RAM via `HardwareDetector`.
+  - Absolute minimum threshold: 4.0 GB RAM.
+  - Lightest entry model: `TinyLlama/TinyLlama-1.1B-Chat-v1.0` (~2.5 GB RAM required).
+  - Status output: `PASS` or `FAIL_BELOW_MINIMUM`.
+
+# 2. Download File Size Inspector (`src/aqruntime/model/manager.py`)
+
+- `estimate_download_size(repository, token=None)`:
+  - Uses `huggingface_hub.model_info` API to inspect model file sizes.
+  - Sums sizes of `.safetensors`, `.bin`, `.pt`, and config files.
+  - Returns formatted human-readable size string (e.g. `~2.2 GB`).

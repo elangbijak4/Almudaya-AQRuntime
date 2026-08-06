@@ -1,0 +1,20 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v0.8
+
+---
+
+# 1. Integrated Web UI Dashboard Architecture
+
+- Single-page application embedded in `src/aqruntime/server/ui/index.html`.
+- Serves Dark Glassmorphism interface at `GET /ui` and `GET /ui/index.html`.
+- Auto-launches default browser using Python `webbrowser.open(url)`.
+
+# 2. REST API Extensions
+
+- `GET /api/doctor`: Returns JSON output of `run_preinstall_check()`.
+- `GET /api/memory`: Returns JSON list of saved sessions.
+- `POST /api/memory/clear`: Expects `{"session": "name"}`.
+- `POST /api/memory/export`: Expects `{"session": "name"}`.

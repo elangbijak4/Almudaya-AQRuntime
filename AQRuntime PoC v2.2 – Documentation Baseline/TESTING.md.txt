@@ -1,0 +1,12 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v2.2
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_vision_model_catalog`: Verifies discovery of Vision models (`vikhyatk/moondream2`).
+- `test_multimodal_api_payload`: Verifies extraction of text and Base64 image payload in `/v1/chat/completions`.

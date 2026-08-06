@@ -1,0 +1,39 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v1.2
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v1.2 – Documentation Baseline
+
+Target Version: PoC v1.2
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v1.2 introduces:
+- Smart Download Inspection (`inspect_download_state`).
+- 100% Installed Detection Notification.
+- Partial Download Detection & Interactive Resume Modal in Web GUI.
+- Two User Options: Resume Download vs Reset Cache & Redownload.
+- API Endpoints (`/api/pull/inspect` & `/api/pull/reset`).

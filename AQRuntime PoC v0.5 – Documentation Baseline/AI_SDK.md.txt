@@ -1,0 +1,22 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v0.5
+
+---
+
+# 1. CLI Commands
+
+| Command | Description |
+|---|---|
+| `aq run <model> [--memory / --no-memory] [--session <name>]` | Run model with persistent or incognito memory |
+| `aq memory list` | List all saved memory sessions |
+| `aq memory clear <name>` | Clear a saved memory session |
+| `aq memory export <name>` | Export a memory session to markdown |
+| `aq discover [query]` | Discover models matching hardware |
+| `aq login [token]` | Authenticate Hugging Face access token |
+| `aq pull <model>` | Download model from Hugging Face |
+| `aq list` | List installed models |
+| `aq remove <model>` | Remove installed model |
+| `aq version` | Display runtime version (0.5.0) |

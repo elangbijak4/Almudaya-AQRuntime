@@ -1,0 +1,13 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v2.1
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/runtime/inference.py`: Added latency and generation speed performance telemetry.
+- `src/aqruntime/server/api.py`: Added `"performance"` dictionary to API response.
+- `src/aqruntime/server/ui/index.html`: Performance badges, File Attachment `📎` button, Persona Presets, and Chat Exporter.

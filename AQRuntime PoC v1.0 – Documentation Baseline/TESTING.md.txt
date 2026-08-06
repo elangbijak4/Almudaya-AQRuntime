@@ -1,0 +1,11 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v1.0
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_server_control_center_routes`: Verifies `/api/discover`, `/api/pull`, `/api/remove`, `/api/login` endpoints.

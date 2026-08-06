@@ -1,0 +1,14 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v0.9
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/model/gguf_loader.py`: GGUF 4-bit model detection and loading.
+- `src/aqruntime/hardware/detector.py`: Added `max_safe_param_size_gguf()` calculation.
+- `src/aqruntime/catalog/manager.py`: Curated GGUF 4-bit model entries tagged `[GGUF-Q4]`.
+- `src/aqruntime/model/manager.py`: Integrated dual PyTorch / GGUF backend routing.

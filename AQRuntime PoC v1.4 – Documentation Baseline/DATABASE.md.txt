@@ -1,0 +1,13 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v1.4
+
+---
+
+# 1. Configuration & Asset Files
+
+- Config File: `config/runtime.yaml` (`runtime_version: "1.4.0"`)
+- GGUF Model Loader: `src/aqruntime/model/gguf_loader.py`
+- Inference Engine: `src/aqruntime/runtime/inference.py`

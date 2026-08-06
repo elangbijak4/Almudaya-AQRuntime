@@ -1,0 +1,26 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v0.2
+
+---
+
+# 1. CLI Commands
+
+| Command | Description |
+|---|---|
+| `aq pull <model>` | Download model from Hugging Face |
+| `aq list` | List all locally installed models |
+| `aq run <model>` | Load model and launch interactive inference session |
+| `aq remove <model>` | Remove model directory from local disk |
+| `aq version` | Display runtime version (0.2.0) |
+
+# 2. Command Examples
+
+```bash
+aq pull google/gemma-2-2b-it
+aq list
+aq run google-gemma-2-2b-it
+aq remove google-gemma-2-2b-it
+```

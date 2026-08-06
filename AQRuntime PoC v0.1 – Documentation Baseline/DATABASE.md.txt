@@ -1,0 +1,196 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v0.1
+
+---
+
+# 1. Overview
+
+AQRuntime stores AI models and runtime configuration in the local file system.
+
+No relational database is required for Proof of Concept v0.1.
+
+---
+
+# 2. Storage Architecture
+
+AQRuntime/
+
+├── models/
+
+├── config/
+
+└── logs/
+
+---
+
+# 3. Directory Specification
+
+## models/
+
+Purpose
+
+Store downloaded AI models.
+
+Example
+
+models/
+
+├── tinyllama/
+
+├── phi3-mini/
+
+└── gemma-3-1b/
+
+---
+
+## config/
+
+Purpose
+
+Store runtime configuration files.
+
+Example
+
+config/
+
+runtime.yaml
+
+---
+
+## logs/
+
+Purpose
+
+Store runtime execution logs.
+
+Example
+
+logs/
+
+runtime.log
+
+---
+
+# 4. Model Storage
+
+Each installed model shall have its own directory.
+
+Example
+
+models/
+
+tinyllama/
+
+config.json
+
+tokenizer.json
+
+model files
+
+...
+
+---
+
+# 5. Configuration Storage
+
+AQRuntime shall maintain a runtime configuration file.
+
+Example
+
+config/
+
+runtime.yaml
+
+Example contents
+
+- Runtime version
+- Default model
+- Model directory
+- Log directory
+
+---
+
+# 6. Log Storage
+
+AQRuntime shall store runtime logs.
+
+Example
+
+logs/
+
+runtime.log
+
+The log file may contain:
+
+- Startup
+- Shutdown
+- Model Download
+- Model Loading
+- Runtime Errors
+
+---
+
+# 7. Data Lifecycle
+
+Model Download
+
+↓
+
+Store Model
+
+↓
+
+Load Model
+
+↓
+
+Run Inference
+
+↓
+
+Remove Model
+
+---
+
+# 8. Persistence Rules
+
+Downloaded models shall remain available after the application terminates.
+
+Configuration shall persist between executions.
+
+Log files shall persist until manually removed.
+
+---
+
+# 9. File Organization
+
+AQRuntime/
+
+models/
+
+<Model Name>/
+
+Model Files
+
+config/
+
+runtime.yaml
+
+logs/
+
+runtime.log
+
+---
+
+# 10. Data Summary
+
+AQRuntime PoC v0.1 stores only three categories of data.
+
+| Data | Storage |
+|--------|----------------|
+| AI Models | models/ |
+| Configuration | config/ |
+| Runtime Logs | logs/ |

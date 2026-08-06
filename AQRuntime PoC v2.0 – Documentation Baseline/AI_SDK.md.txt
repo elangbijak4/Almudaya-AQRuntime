@@ -1,0 +1,12 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v2.0
+
+---
+
+# 1. API Endpoints
+
+- `GET /api/runtimes`: Returns JSON list of available runtimes.
+- `POST /v1/chat/completions`: Accepts optional `"runtime"` field.

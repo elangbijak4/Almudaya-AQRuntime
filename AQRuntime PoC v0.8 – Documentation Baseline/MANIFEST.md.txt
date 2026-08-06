@@ -1,0 +1,38 @@
+# MANIFEST.md
+
+# AQRuntime Documentation Manifest
+
+Version: PoC v0.8
+
+---
+
+# 1. Baseline Identity
+
+Baseline Name: AQRuntime PoC v0.8 – Documentation Baseline
+
+Target Version: PoC v0.8
+
+Status: Frozen
+
+---
+
+# 2. Document Set
+
+- README.md.txt
+- MANIFEST.md.txt
+- REQUIREMENTS.md.txt
+- DESIGN.md.txt
+- DATABASE.md.txt
+- AI_SDK.md.txt
+- IMPLEMENTATION.md.txt
+- TESTING.md.txt
+
+---
+
+# 3. Evolution Summary
+
+PoC v0.8 introduces:
+- Integrated Web UI Dashboard launched via `aq ui`.
+- Built-in single page web interface (`src/aqruntime/server/ui/index.html`).
+- Automated default browser launching.
+- Embedded hardware diagnostic and memory manager panel.

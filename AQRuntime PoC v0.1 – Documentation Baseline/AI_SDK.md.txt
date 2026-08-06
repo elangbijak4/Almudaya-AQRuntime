@@ -1,0 +1,265 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v0.1
+
+---
+
+# 1. Overview
+
+AQRuntime provides a simple command-line interface (CLI) for managing and executing AI models.
+
+The AI SDK defines the public runtime interface available to users.
+
+---
+
+# 2. Runtime Commands
+
+AQRuntime provides five commands.
+
+| Command | Description |
+|----------|-------------|
+| aq pull | Download an AI model |
+| aq list | Display installed models |
+| aq run | Execute an AI model |
+| aq remove | Remove an installed model |
+| aq version | Display runtime version |
+
+---
+
+# 3. Command Specification
+
+## aq pull
+
+Purpose
+
+Download an AI model.
+
+Syntax
+
+```bash
+aq pull <model>
+```
+
+Example
+
+```bash
+aq pull TinyLlama/TinyLlama-1.1B-Chat-v1.0
+```
+
+Output
+
+```
+Downloading model...
+
+Completed.
+```
+
+---
+
+## aq list
+
+Purpose
+
+Display installed models.
+
+Syntax
+
+```bash
+aq list
+```
+
+Example Output
+
+```
+Installed Models
+
+- tinyllama
+- phi3-mini
+- gemma-3-1b
+```
+
+---
+
+## aq run
+
+Purpose
+
+Load a model and start an interactive inference session.
+
+Syntax
+
+```bash
+aq run <model>
+```
+
+Example
+
+```bash
+aq run tinyllama
+```
+
+---
+
+## aq remove
+
+Purpose
+
+Remove an installed model.
+
+Syntax
+
+```bash
+aq remove <model>
+```
+
+Example
+
+```bash
+aq remove tinyllama
+```
+
+Output
+
+```
+Model removed.
+```
+
+---
+
+## aq version
+
+Purpose
+
+Display runtime version.
+
+Syntax
+
+```bash
+aq version
+```
+
+Example Output
+
+```
+AQRuntime
+Version 0.1.0
+```
+
+---
+
+# 4. Interactive Session
+
+The interactive session begins after the user executes:
+
+```bash
+aq run <model>
+```
+
+The runtime displays:
+
+```
+AQRuntime>
+```
+
+The user enters a prompt.
+
+Example
+
+```
+AQRuntime>
+
+Hello
+```
+
+The model generates a response.
+
+Example
+
+```
+Model>
+
+Hello!
+How can I help you today?
+```
+
+The session continues until the user enters:
+
+```
+exit
+```
+
+---
+
+# 5. Runtime Session
+
+Runtime Start
+
+↓
+
+Load Model
+
+↓
+
+Interactive Prompt
+
+↓
+
+Model Response
+
+↓
+
+Interactive Prompt
+
+↓
+
+Exit
+
+↓
+
+Runtime Stop
+
+---
+
+# 6. Error Responses
+
+Examples
+
+Unknown command
+
+```
+Unknown command.
+```
+
+Unknown model
+
+```
+Model not found.
+```
+
+Download failed
+
+```
+Download failed.
+```
+
+Runtime error
+
+```
+Runtime error.
+```
+
+---
+
+# 7. SDK Summary
+
+AQRuntime exposes five public runtime commands.
+
+- aq pull
+- aq list
+- aq run
+- aq remove
+- aq version
+
+These commands constitute the complete public interface of AQRuntime PoC v0.1.

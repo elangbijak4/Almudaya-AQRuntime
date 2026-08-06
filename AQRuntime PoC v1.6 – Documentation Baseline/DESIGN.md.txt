@@ -1,0 +1,12 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v1.6
+
+---
+
+# 1. GATED Diagnostics & NVIDIA Catalog Design
+
+- Error Handler: Formats Hugging Face authorization exceptions into step-by-step Indonesian guidance.
+- Catalog Provider: `CatalogManager.discover_models("nvidia")` fetches authored models from `author=nvidia`.

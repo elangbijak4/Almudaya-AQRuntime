@@ -1,0 +1,23 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v0.8
+
+---
+
+# 1. CLI Commands
+
+| Command | Description |
+|---|---|
+| `aq ui [--host HOST] [--port PORT] [--no-browser]` | Launch server and auto-open Web UI Dashboard |
+| `aq serve [--host HOST] [--port PORT]` | Launch local HTTP REST API Server |
+| `aq run <model> [--system <prompt>]` | Run model with custom system prompt override |
+| `aq doctor` | Run pre-installation hardware requirement diagnostic |
+| `aq pull <model> [--yes]` | Estimate file size & prompt confirmation before downloading |
+| `aq discover [query]` | Discover models matching hardware capacity |
+| `aq login [token]` | Authenticate Hugging Face access token |
+| `aq list` | List installed models |
+| `aq memory <subcommand>` | Manage saved conversation memories |
+| `aq remove <model>` | Remove installed model directory |
+| `aq version` | Display runtime version (0.8.0) |

@@ -1,0 +1,23 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v0.9
+
+---
+
+# 1. CLI Commands
+
+| Command | Description |
+|---|---|
+| `aq discover gguf` | Discover GGUF 4-bit quantized low-RAM models |
+| `aq pull <gguf_repo>` | Download GGUF 4-bit quantized model weights |
+| `aq run <gguf_model>` | Run GGUF 4-bit model with ultra-low RAM footprint |
+| `aq ui` | Launch server and auto-open Web UI Dashboard |
+| `aq serve` | Launch local OpenAI-compatible HTTP REST API Server |
+| `aq doctor` | Run pre-installation hardware requirement diagnostic |
+| `aq login [token]` | Authenticate Hugging Face access token |
+| `aq list` | List installed models |
+| `aq memory <subcommand>` | Manage saved conversation memories |
+| `aq remove <model>` | Remove installed model directory |
+| `aq version` | Display runtime version (0.9.0) |

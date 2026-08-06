@@ -1,0 +1,15 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v1.0
+
+---
+
+# 1. Configuration & Asset Files
+
+- Config File: `config/runtime.yaml` (`runtime_version: "1.0.0"`)
+- Offline Catalog Cache: `config/catalog_cache.json`
+- UI Single-Page Asset: `src/aqruntime/server/ui/index.html`
+- Memory Storage: `memory/<session_name>.json`
+- Model Storage: `models/<sanitized_repo_name>/`

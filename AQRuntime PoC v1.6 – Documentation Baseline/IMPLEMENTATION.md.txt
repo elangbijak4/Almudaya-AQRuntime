@@ -1,0 +1,14 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v1.6
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/catalog.py`: Added NVIDIA discovery catalog provider.
+- `src/aqruntime/runtime/inference.py`: Added GATED model error diagnostic handler.
+- `src/aqruntime/server/ui/index.html`: Added Download Toast, Terminal Hint, and Auto-Switch to Chat.
+- `docs/Development_History.md`: Created development history tracking document.

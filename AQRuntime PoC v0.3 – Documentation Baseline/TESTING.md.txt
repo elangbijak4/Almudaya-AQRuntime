@@ -1,0 +1,14 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v0.3
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_hardware_detector`: Verifies system RAM and CPU query return valid non-zero values.
+- `test_catalog_manager_offline_fallback`: Verifies catalog manager falls back to bundled JSON cache when network is offline.
+- `test_catalog_manager_filtering`: Verifies model recommendation filtering against hardware thresholds.
+- `test_discover_cli`: Verifies `aq discover` executes cleanly and formats output.

@@ -1,0 +1,13 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v1.3
+
+---
+
+# 1. API Endpoints
+
+| Endpoint | Description |
+|---|---|
+| `GET /api/pull/status` | Returns pull status including `sleep_lock_active` flag |

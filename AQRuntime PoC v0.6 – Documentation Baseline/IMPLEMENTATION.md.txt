@@ -1,0 +1,13 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v0.6
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/setup_diagnostic.py`: Pre-installation hardware check and minimum entry model guidance.
+- `src/aqruntime/model/manager.py`: Added `estimate_download_size()` API metadata query.
+- `src/aqruntime/cli/app.py`: Added `aq doctor` CLI command and interactive confirmation prompt in `aq pull` (`Proceed with download? [y/N]`).

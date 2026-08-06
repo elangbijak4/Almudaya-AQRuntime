@@ -1,0 +1,13 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v2.0
+
+---
+
+# 1. Heterogeneous Execution Architecture
+
+- Base Provider: `src/aqruntime/runtime/providers/base.py` (`ExecutionProvider`).
+- Manager: `src/aqruntime/runtime/provider_manager.py` (`ProviderManager`).
+- Priority Chain: `intel-npu` -> `intel-arc` -> `openvino` -> `directml` -> `cuda` -> `cpu` -> `cloud`.

@@ -1,0 +1,22 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v1.0
+
+---
+
+# 1. Desktop Control Center Architecture (`src/aqruntime/server/ui/index.html`)
+
+- Tab 1: Chat & Inference (`aq run`).
+- Tab 2: Model Hub & Discovery (`aq discover`, `aq pull`).
+- Tab 3: Local Models Manager (`aq list`, `aq remove`).
+- Tab 4: Hardware Doctor (`aq doctor`, `aq version`).
+- Tab 5: Settings & Auth (`aq login`, `aq memory`).
+
+# 2. REST API Extension Map (`src/aqruntime/server/api.py`)
+
+- `GET /api/discover?q=query`: Discovery catalog items.
+- `POST /api/pull`: `{"repository": "owner/repo"}` -> Downloads model.
+- `POST /api/remove`: `{"model": "name"}` -> Deletes local model.
+- `POST /api/login`: `{"token": "hf_..."}` -> Saves access token.

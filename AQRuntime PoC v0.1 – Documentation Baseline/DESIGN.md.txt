@@ -1,0 +1,298 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v0.1
+
+---
+
+# 1. Overview
+
+AQRuntime is a lightweight AI Runtime responsible for downloading, storing, loading, and executing AI models through a command-line interface.
+
+This document defines the logical architecture of AQRuntime PoC v0.1.
+
+---
+
+# 2. Design Objectives
+
+The software shall:
+
+- Maintain a simple architecture.
+- Separate responsibilities between components.
+- Support the complete AI model lifecycle.
+- Be easy to implement and maintain.
+
+---
+
+# 3. System Architecture
+
+```
+
++----------------------+
+\| Command Line Interface |
++----------+-----------+
+|
+v
++----------------------+
+\| Runtime Core |
++----------+-----------+
+|
++------------+------------+
+| | |
+v v v
++-----------+ +-----------+ +----------------+
+\| Model | | Storage | | Inference |
+\| Manager | | Manager | | Engine |
++-----------+ +-----------+ +----------------+
+
+```
+
+---
+
+# 4. Component Description
+
+## 4.1 Command Line Interface
+
+Responsibilities
+
+- Receive user commands.
+- Validate command syntax.
+- Display runtime output.
+- Start interactive session.
+
+---
+
+## 4.2 Runtime Core
+
+Responsibilities
+
+- Coordinate all runtime operations.
+- Execute application workflow.
+- Route commands to corresponding components.
+
+---
+
+## 4.3 Model Manager
+
+Responsibilities
+
+- Download models.
+- Load models.
+- Remove models.
+- Retrieve model information.
+
+---
+
+## 4.4 Storage Manager
+
+Responsibilities
+
+- Store downloaded models.
+- Read installed models.
+- Delete stored models.
+
+---
+
+## 4.5 Inference Engine
+
+Responsibilities
+
+- Load AI model into memory.
+- Receive prompts.
+- Generate responses.
+- Return inference results.
+
+---
+
+# 5. Runtime Workflow
+
+User
+
+↓
+
+CLI
+
+↓
+
+Runtime Core
+
+↓
+
+Model Manager
+
+↓
+
+Storage Manager
+
+↓
+
+Inference Engine
+
+↓
+
+Runtime Core
+
+↓
+
+CLI
+
+↓
+
+User
+
+---
+
+# 6. Command Processing
+
+aq pull
+
+↓
+
+Download Model
+
+↓
+
+Store Model
+
+↓
+
+Completed
+
+---
+
+aq list
+
+↓
+
+Read Installed Models
+
+↓
+
+Display List
+
+---
+
+aq run
+
+↓
+
+Load Model
+
+↓
+
+Interactive Prompt
+
+↓
+
+Generate Response
+
+↓
+
+Display Output
+
+---
+
+aq remove
+
+↓
+
+Delete Model
+
+↓
+
+Completed
+
+---
+
+aq version
+
+↓
+
+Display Version
+
+---
+
+# 7. Interactive Session
+
+```
+
+User executes:
+
+aq run tinyllama
+
+↓
+
+Runtime loads model.
+
+↓
+
+AQRuntime>
+
+↓
+
+User enters prompt.
+
+↓
+
+Inference Engine generates response.
+
+↓
+
+AQRuntime>
+
+↓
+
+Repeat until user types:
+
+exit
+
+```
+
+---
+
+# 8. Design Constraints
+
+The architecture shall:
+
+- remain modular.
+- avoid unnecessary dependencies.
+- avoid distributed execution.
+- avoid network inference.
+- avoid hardware-specific optimization.
+
+---
+
+# 9. External Interfaces
+
+Input
+
+- CLI Commands
+- User Prompt
+
+Output
+
+- Console Output
+- Model Response
+
+Storage
+
+- Local File System
+
+Network
+
+- Online Model Repository (download only)
+
+---
+
+# 10. Design Summary
+
+AQRuntime PoC v0.1 consists of five logical components:
+
+- Command Line Interface
+- Runtime Core
+- Model Manager
+- Storage Manager
+- Inference Engine
+
+These components collectively implement the minimum AI Runtime required for Proof of Concept.

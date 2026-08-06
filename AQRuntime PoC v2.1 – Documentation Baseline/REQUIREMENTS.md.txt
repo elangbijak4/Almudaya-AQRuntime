@@ -1,0 +1,17 @@
+# REQUIREMENTS.md
+
+# AQRuntime Software Requirements Specification
+
+Version: PoC v2.1
+
+---
+
+# 1. Functional Requirements
+
+- FR-076: Measure generation start/end time and calculate `tokens_per_second`, `latency_seconds`, `total_seconds` telemetry.
+- FR-077: Include `"performance"` telemetry object in `/v1/chat/completions` API response.
+- FR-078: Render live performance badge (`⚡ 18.5 tok/s • 0.42s latency`) under assistant chat bubbles in Web GUI.
+- FR-079: Provide Document Attachment button (`📎`) next to prompt input allowing file text reading (`.py`, `.txt`, `.json`, `.md`, `.log`, `.csv`).
+- FR-080: Provide Persona Presets Gallery dropdown in Tab 1 sidebar.
+- FR-081: Provide 1-Click Chat Exporter button (`📥 Export Chat (.md)`).
+- FR-082: Living Development History file (`docs/Development_History.md`) updated across all evolution cycles.

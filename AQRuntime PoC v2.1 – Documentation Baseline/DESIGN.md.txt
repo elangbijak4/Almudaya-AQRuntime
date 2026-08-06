@@ -1,0 +1,12 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v2.1
+
+---
+
+# 1. Telemetry & Feature Design
+
+- Telemetry: `InferenceEngine.generate()` captures `perf_counter()` latency and token generation speed.
+- File Reader: Web GUI uses HTML5 `FileReader` API to parse text files client-side without extra backend storage.

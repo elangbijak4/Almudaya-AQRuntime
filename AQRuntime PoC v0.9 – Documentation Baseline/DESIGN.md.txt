@@ -1,0 +1,22 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v0.9
+
+---
+
+# 1. GGUF Model Loader Architecture (`src/aqruntime/model/gguf_loader.py`)
+
+- `GGUFModelLoader`:
+  - Scans model storage directory for `.gguf` files.
+  - Reads magic header `GGUF` (bytes `0x46 0x55 0x47 0x47`).
+  - Evaluates quantization scheme (Q4_K_M, Q8_0, Q5_K_M).
+  - Loads model using `llama-cpp-python` or fallback GGUF runtime wrapper.
+  - Exposes standard tokenizer and language model interface.
+
+# 2. Dual Engine Routing (`src/aqruntime/model/manager.py`)
+
+- `ModelManager.load(model_name)` checks directory contents:
+  - If `.gguf` file is present -> delegates to `GGUFModelLoader`.
+  - Else -> delegates to `transformers.AutoModelForCausalLM`.

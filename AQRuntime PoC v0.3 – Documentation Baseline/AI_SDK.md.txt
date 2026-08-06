@@ -1,0 +1,18 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v0.3
+
+---
+
+# 1. CLI Commands
+
+| Command | Description |
+|---|---|
+| `aq discover` | Detect hardware & discover compatible models (online or offline cache) |
+| `aq pull <model>` | Download model from Hugging Face |
+| `aq list` | Display installed local models |
+| `aq run <model>` | Execute model in interactive session |
+| `aq remove <model>` | Remove local model directory |
+| `aq version` | Display runtime version (0.3.0) |

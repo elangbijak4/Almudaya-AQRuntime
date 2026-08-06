@@ -1,0 +1,13 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v1.1
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/model/manager.py`: Async background thread download manager.
+- `src/aqruntime/server/api.py`: Non-blocking `POST /api/pull` & polling `GET /api/pull/status`.
+- `src/aqruntime/server/ui/index.html`: Download Progress Modal with auto-resume indicator.

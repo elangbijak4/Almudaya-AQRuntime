@@ -1,0 +1,12 @@
+# IMPLEMENTATION.md
+
+# AQRuntime Implementation Specification
+
+Version: PoC v1.4
+
+---
+
+# 1. Implementation Components
+
+- `src/aqruntime/model/gguf_loader.py`: `generate_text` methods for `GGUFModelWrapper` and `SimulatedGGUFModel`.
+- `src/aqruntime/runtime/inference.py`: `_generate_gguf` routing logic.

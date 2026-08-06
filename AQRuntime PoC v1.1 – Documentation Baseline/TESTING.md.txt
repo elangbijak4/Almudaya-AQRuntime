@@ -1,0 +1,11 @@
+# TESTING.md
+
+# AQRuntime Testing Specification
+
+Version: PoC v1.1
+
+---
+
+# 1. Acceptance Test Coverage
+
+- `test_async_pull_status_api`: Verifies background pull status polling endpoint returns 200 OK.

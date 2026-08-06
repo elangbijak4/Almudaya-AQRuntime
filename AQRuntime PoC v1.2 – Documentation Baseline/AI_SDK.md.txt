@@ -1,0 +1,14 @@
+# AI_SDK.md
+
+# AQRuntime AI SDK Specification
+
+Version: PoC v1.2
+
+---
+
+# 1. API Endpoints
+
+| Endpoint | Description |
+|---|---|
+| `POST /api/pull/inspect` | Inspect download completion and cached partial bytes |
+| `POST /api/pull/reset` | Clear partial cache and start fresh 0% download |

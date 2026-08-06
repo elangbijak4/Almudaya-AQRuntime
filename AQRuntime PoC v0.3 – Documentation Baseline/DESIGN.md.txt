@@ -1,0 +1,40 @@
+# DESIGN.md
+
+# AQRuntime Software Design Specification
+
+Version: PoC v0.3
+
+---
+
+# 1. System Architecture
+
+```
++-------------------------------------------------------+
+|             Command Line Interface (CLI)              |
+|              (src/aqruntime/cli/app.py)               |
++--------------------------+----------------------------+
+                           |
+                           v
++-------------------------------------------------------+
+|                     Runtime Core                      |
+|             (src/aqruntime/runtime/core.py)           |
++------+-------------------+--------------------+-------+
+       |                   |                    |       |
+       v                   v                    v       v
++--------------+    +--------------+    +----------+ +-----------+
+| Model Manager|    |StorageManager|    | Hardware | | Catalog   |
+| (src/model/) |    |(src/storage/)|    | Detector | | Manager   |
++--------------+    +--------------+    +----------+ +-----------+
+```
+
+# 2. Component Design
+
+## Hardware Detector (`src/aqruntime/hardware/detector.py`)
+- Queries total system RAM, free RAM, and CPU core counts.
+- Computes maximum recommended model parameter size (e.g. 16GB RAM -> max 3.8B parameters FP16).
+
+## Catalog Manager (`src/aqruntime/catalog/manager.py`)
+- Reads offline permanent catalog cache `config/catalog_cache.json`.
+- Queries Hugging Face Hub API for live model search when online.
+- Updates local catalog cache file when online results are retrieved.
+- Scores and filters models based on `HardwareDetector` capacity.

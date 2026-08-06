@@ -1,0 +1,27 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v0.2
+
+---
+
+# 1. Directory Structure
+
+```
+AQRuntime/
+├── models/
+│   ├── tinyllama/
+│   ├── google-gemma-2-2b-it/
+│   └── meta-llama-llama-3-2-1b-instruct/
+├── config/
+│   └── runtime.yaml
+└── logs/
+    └── runtime.log
+```
+
+# 2. Model Naming Convention
+
+In PoC v0.2, model directories inside `models/` follow the sanitized full name format:
+- Input: `Google/Gemma-2-2B-IT` -> Storage Directory: `google-gemma-2-2b-it`
+- Input: `TinyLlama/TinyLlama-1.1B-Chat-v1.0` -> Storage Directory: `tinyllama-tinyllama-1-1b-chat-v1-0` (or `tinyllama` for single-word legacy aliases).

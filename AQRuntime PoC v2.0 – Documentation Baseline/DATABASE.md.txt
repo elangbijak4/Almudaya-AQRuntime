@@ -1,0 +1,11 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v2.0
+
+---
+
+# 1. Configuration & Asset Files
+
+- Config File: `config/runtime.yaml` (`runtime_version: "2.0.0"`)

@@ -1,0 +1,14 @@
+# DATABASE.md
+
+# AQRuntime Data Storage Specification
+
+Version: PoC v0.9
+
+---
+
+# 1. Configuration & Asset Files
+
+- Config File: `config/runtime.yaml` (`runtime_version: "0.9.0"`)
+- Offline Catalog Cache: `config/catalog_cache.json` (includes GGUF curated models)
+- Memory Storage: `memory/<session_name>.json`
+- Model Directory: `models/<sanitized_repo_name>/<filename>.gguf`

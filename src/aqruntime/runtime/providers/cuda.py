@@ -15,8 +15,11 @@ class CUDAExecutionProvider(ExecutionProvider):
             if torch.cuda.is_available():
                 return True, f"CUDA Available: {torch.cuda.get_device_name(0)}"
             return False, "CUDA not detected (No NVIDIA GPU or driver missing)."
-        except ImportError:
-            return False, "PyTorch with CUDA support not installed."
+        except Exception as error:
+            # A local PyTorch install can exist while its native DLLs or GPU
+            # driver are unavailable. Treat that as an unavailable provider so
+            # diagnostics and CPU fallback keep working.
+            return False, f"CUDA probe failed: {type(error).__name__}: {error}"
 
     def get_info(self) -> dict:
         available, msg = self.is_available()

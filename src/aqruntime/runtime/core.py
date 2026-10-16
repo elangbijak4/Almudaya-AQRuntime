@@ -1,10 +1,15 @@
 """Runtime core coordinating CLI operations."""
 
 import logging
+import os
+import threading
+from collections import OrderedDict
+from contextlib import contextmanager
 from pathlib import Path
 
 from aqruntime.config import RuntimeSettings, load_settings
 from aqruntime.model import ModelManager
+from aqruntime.model.gguf_loader import GGUFModelLoader
 from aqruntime.runtime.inference import InferenceEngine
 from aqruntime.storage import StorageManager
 
@@ -27,6 +32,10 @@ class RuntimeCore:
         self.catalog = CatalogManager(self.settings.model_directory.parent)
         self.memory = MemoryManager(self.settings.model_directory.parent)
         self.providers = ProviderManager()
+        self._inference_cache: OrderedDict[str, InferenceEngine] = OrderedDict()
+        self._inference_lock = threading.RLock()
+        self._cache_lock = threading.RLock()
+        GGUFModelLoader.default_n_ctx = self.settings.n_ctx
         self.logger.info("Runtime startup")
 
     def discover(self, query: str | None = None) -> dict:
@@ -67,17 +76,58 @@ class RuntimeCore:
     def list_models(self) -> list[str]:
         return self.storage.list_models()
 
+    def list_chat_models(self) -> list[str]:
+        return self.storage.list_chat_models()
+
+    def model_type(self, model: str) -> str:
+        return self.storage.classify_model(model)
+
+    def model_capabilities(self, model: str) -> dict:
+        return self.storage.model_capabilities(model)
+
     def load_inference(
         self,
         model: str,
         persistent: bool = True,
         session_name: str | None = None,
         system_prompt: str | None = None,
+        provider: str | None = None,
     ) -> InferenceEngine:
-        tokenizer, language_model = self.models.load(model)
-        self.logger.info("Model loading: %s", model)
+        path = self.storage.path_for(model)
+        if not path.is_dir():
+            raise FileNotFoundError("Model not found.")
+        if self.model_type(model) != "text":
+            raise ValueError(f"Model '{model}' is not a chat model. Type: {self.model_type(model)}.")
+        GGUFModelLoader.default_n_ctx = self.settings.n_ctx
+
+        cacheable = (
+            self.settings.max_cached_models > 0
+            and persistent
+            and session_name is None
+            and system_prompt is None
+        )
+        cache_key = None
+        if cacheable:
+            cache_key = f"{provider or 'auto'}::{model}"
+
+        with self._cache_lock:
+            if cache_key is not None and cache_key in self._inference_cache:
+                engine = self._inference_cache[cache_key]
+                self._inference_cache.move_to_end(cache_key)
+                self.logger.info("Reusing warm inference cache: %s", cache_key)
+                return engine
+
+        selected_provider = self.providers.resolve_provider(provider, path)
+        tokenizer, language_model = selected_provider.load_model(path)
+        if provider and selected_provider.name != provider.replace("-", "_"):
+            self.logger.info(
+                "Requested provider '%s' unavailable; using %s fallback",
+                provider,
+                selected_provider.name,
+            )
+        self.logger.info("Model loading: %s via %s", model, selected_provider.name)
         s_name = session_name or self.storage.model_name(model)
-        return InferenceEngine(
+        engine = InferenceEngine(
             tokenizer,
             language_model,
             memory_manager=self.memory,
@@ -85,6 +135,24 @@ class RuntimeCore:
             persistent=persistent,
             system_prompt=system_prompt,
         )
+        setattr(engine, "_cached", cacheable)
+
+        with self._cache_lock:
+            if cacheable and cache_key is not None:
+                while len(self._inference_cache) >= self.settings.max_cached_models:
+                    evicted_key, evicted_engine = self._inference_cache.popitem(last=False)
+                    self.logger.info("Evicting warm inference cache: %s", evicted_key)
+                    try:
+                        evicted_engine.unload(force=True)
+                    except Exception:
+                        pass
+                self._inference_cache[cache_key] = engine
+        return engine
+
+    @contextmanager
+    def inference_lock(self):
+        with self._inference_lock:
+            yield
 
     def memory_list(self) -> list[dict]:
         return self.memory.list_sessions()
@@ -114,6 +182,13 @@ class RuntimeCore:
         return removed
 
     def shutdown(self) -> None:
+        with self._cache_lock:
+            for key, engine in list(self._inference_cache.items()):
+                try:
+                    engine.unload(force=True)
+                except Exception:
+                    pass
+            self._inference_cache.clear()
         self.logger.info("Runtime shutdown")
         self.log_handler.close()
         self.logger.removeHandler(self.log_handler)

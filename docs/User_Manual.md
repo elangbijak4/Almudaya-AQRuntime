@@ -1,10 +1,14 @@
 # AQRuntime User Manual
 
-This file serves as the official **User Manual** for AQRuntime.
+This file points to the current AQRuntime2 user instructions.
 
-For the full step-by-step tutorial, command reference, parameter specifications, hardware guidance, and troubleshooting, please refer to the primary guide:
+For installation with Python 3.12, Web Control Center usage, CLI commands, API examples, supported features, and troubleshooting, see:
 
-👉 **[User_Guide.md](file:///d:/AQRuntime/docs/User_Guide.md)**
+👉 **[Panduan Penggunaan AQRuntime2](PANDUAN_PENGGUNAAN_AQRUNTIME2.md)**
+
+English: **[AQRuntime2 User Guide](AQRUNTIME2_USER_GUIDE.md)**
+
+The older [`User_Guide.md`](User_Guide.md) documents historical v2.4 release claims and may not reflect the latest verified behavior of this checkout.
 
 ---
 

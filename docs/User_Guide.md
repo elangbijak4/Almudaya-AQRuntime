@@ -72,7 +72,7 @@ Open Command Prompt (`cmd`), PowerShell, or Terminal, and navigate to the projec
 
 ```bash
 # Windows Command Prompt / PowerShell
-cd /d D:\AQRuntime
+cd /d D:\AQRuntime2
 ```
 
 ### Step 2: Create & Activate Virtual Environment
@@ -301,7 +301,7 @@ Sesaat sebelum mengunduh, AQRuntime menghitung total ukuran berkas repositori vi
 ==================================================================
 Repository ID   : google/gemma-2-2b-it
 Estimated Size  : ~4.8 GB
-Storage Path    : D:\AQRuntime\models\google-gemma-2-2b-it
+Storage Path    : D:\AQRuntime2\models\google-gemma-2-2b-it
 Notice          : This operation uses your network connection.
 ==================================================================
 

@@ -166,12 +166,13 @@ def run(
     session: str = typer.Option(None, "--session", "-s", help="Custom session name for memory storage."),
     system: str = typer.Option(None, "--system", "-sys", help="Custom system prompt override."),
     max_tokens: int = typer.Option(512, "--max-tokens", "-n", help="Maximum output tokens limit (64-8192)."),
+    provider: str = typer.Option(None, "--provider", "-pr", help="Preferred runtime provider (auto fallback when unavailable)."),
 ) -> None:
     """Load MODEL and start an interactive local inference session."""
     runtime = core()
     try:
         engine = runtime.load_inference(
-            model, persistent=memory, session_name=session, system_prompt=system
+            model, persistent=memory, session_name=session, system_prompt=system, provider=provider
         )
     except (FileNotFoundError, RuntimeError) as error:
         typer.echo(str(error))
@@ -251,7 +252,10 @@ def export_memory_session(
 ) -> None:
     """Export a memory session to a markdown file."""
     from pathlib import Path
-    target = Path(output) if output else Path(f"memory_{session}_export.md")
+    import re
+    safe_session = re.sub(r"[^a-zA-Z0-9_-]", "-", str(session))
+    safe_session = re.sub(r"\.{2,}|-{2,}", "-", safe_session).strip("-") or "session"
+    target = Path(output) if output else Path(f"memory_{safe_session}_export.md")
     if core().memory_export(session, target):
         typer.echo(f"Memory session '{session}' exported to {target.resolve()}")
     else:

@@ -1,7 +1,10 @@
 """OpenAI-compatible HTTP REST API Server & Web UI Handler for AQRuntime."""
 
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
+import base64
 import json
+from email.parser import BytesParser
+from email.policy import default as default_email_policy
 from pathlib import Path
 import time
 import urllib.parse
@@ -33,6 +36,83 @@ class AQRuntimeAPIHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(payload)
 
+    def _send_openai_error(
+        self,
+        status: int,
+        message: str,
+        error_type: str = "invalid_request_error",
+        code: str | None = None,
+    ) -> None:
+        payload = {
+            "error": {
+                "message": message,
+                "type": error_type,
+                "code": code or ("http_" + str(status)),
+            }
+        }
+        body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _begin_sse(self) -> None:
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "close")
+        self.send_header("X-Accel-Buffering", "no")
+        self.end_headers()
+
+    def _write_sse(self, event: str) -> None:
+        self.wfile.write((event + "\n\n").encode("utf-8"))
+        self.wfile.flush()
+
+    def _send_sse_completion(self, model_name: str, response_text: str) -> None:
+        completion_id = f"chatcmpl-{int(time.time())}"
+        created = int(time.time())
+        self._begin_sse()
+        self._write_sse(
+            "data: "
+            + json.dumps(
+                {
+                    "id": completion_id,
+                    "object": "chat.completion.chunk",
+                    "created": created,
+                    "model": model_name,
+                    "choices": [
+                        {
+                            "index": 0,
+                            "delta": {"role": "assistant", "content": response_text},
+                            "finish_reason": None,
+                        }
+                    ],
+                },
+                ensure_ascii=False,
+            )
+        )
+        self._write_sse(
+            "data: "
+            + json.dumps(
+                {
+                    "id": completion_id,
+                    "object": "chat.completion.chunk",
+                    "created": created,
+                    "model": model_name,
+                    "choices": [
+                        {
+                            "index": 0,
+                            "delta": {},
+                            "finish_reason": "stop",
+                        }
+                    ],
+                },
+                ensure_ascii=False,
+            )
+        )
+        self._write_sse("data: [DONE]")
+
     def do_OPTIONS(self) -> None:
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -60,12 +140,34 @@ class AQRuntimeAPIHandler(BaseHTTPRequestHandler):
             return
 
         if path in ("/v1/models", "/models"):
-            models = self.runtime.list_models() if self.runtime else []
-            data = [
-                {"id": m, "object": "model", "owned_by": "aqruntime", "created": int(time.time())}
-                for m in models
-            ]
+            models = self.runtime.list_chat_models() if self.runtime else []
+            data = []
+            for model in models:
+                data.append(
+                    {
+                        "id": model,
+                        "object": "model",
+                        "created": int(time.time()),
+                        "owned_by": "aqruntime",
+                        "type": self.runtime.model_type(model) if self.runtime else "text",
+                        "capabilities": self.runtime.model_capabilities(model) if self.runtime else {},
+                    }
+                )
             self._send_json(200, {"object": "list", "data": data})
+            return
+
+        if path == "/api/models/capabilities":
+            models = self.runtime.list_models() if self.runtime else []
+            capabilities = []
+            for model in models:
+                capabilities.append(
+                    {
+                        "id": model,
+                        "type": self.runtime.model_type(model) if self.runtime else "text",
+                        "capabilities": self.runtime.model_capabilities(model) if self.runtime else {},
+                    }
+                )
+            self._send_json(200, {"models": capabilities})
             return
 
         if path == "/api/doctor":
@@ -114,6 +216,51 @@ class AQRuntimeAPIHandler(BaseHTTPRequestHandler):
         except Exception:
             payload = {}
 
+        if path in ("/v1/audio/transcriptions", "/audio/transcriptions"):
+            content_type = self.headers.get("Content-Type", "")
+            file_bytes = None
+            filename = "audio.wav"
+            if "multipart/form-data" in content_type:
+                mail = BytesParser(policy=default_email_policy).parsebytes(
+                    (
+                        "Content-Type: "
+                        + content_type
+                        + "\r\nMIME-Version: 1.0\r\n\r\n"
+                    ).encode("utf-8")
+                    + body_bytes
+                )
+                if mail.is_multipart():
+                    for part in mail.iter_parts():
+                        disposition = part.get("Content-Disposition", "")
+                        part_filename = part.get_filename()
+                        if part_filename:
+                            file_bytes = part.get_payload(decode=True)
+                            filename = part_filename or filename
+                        else:
+                            name = None
+                            for segment in disposition.split(";"):
+                                segment = segment.strip()
+                                if segment.startswith("name="):
+                                    name = segment[5:].strip().strip('"')
+                            if name == "file" and file_bytes is None:
+                                payload_bytes = part.get_payload(decode=True)
+                                if payload_bytes:
+                                    file_bytes = payload_bytes
+                                    filename = "audio.wav"
+
+            if not file_bytes:
+                self._send_openai_error(400, "Field 'file' is required.", code="missing_file")
+                return
+
+            from aqruntime.model.audio import AudioProcessor
+
+            result = AudioProcessor.transcribe_audio_payload(
+                base64.b64encode(file_bytes).decode("ascii"),
+                filename=filename,
+            )
+            self._send_json(200, {"text": result["text"]})
+            return
+
         if path == "/api/audio/transcribe":
             audio_base64 = payload.get("audio") or payload.get("data")
             filename = payload.get("filename", "recording.wav")
@@ -128,6 +275,9 @@ class AQRuntimeAPIHandler(BaseHTTPRequestHandler):
         if path in ("/v1/chat/completions", "/chat/completions"):
             model_name = payload.get("model")
             messages = payload.get("messages", [])
+            stream = bool(payload.get("stream", False))
+            tools = payload.get("tools") or payload.get("functions")
+            tool_choice = payload.get("tool_choice")
 
             if not model_name:
                 self._send_json(400, {"error": "Field 'model' is required."})
@@ -137,7 +287,11 @@ class AQRuntimeAPIHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"error": "Field 'messages' is required."})
                 return
 
-            max_tokens = int(payload.get("max_tokens", 512))
+            try:
+                max_tokens = max(64, min(int(payload.get("max_tokens", 512)), 8192))
+            except (TypeError, ValueError):
+                self._send_json(400, {"error": "Field 'max_tokens' must be an integer."})
+                return
 
             from aqruntime.model.vision import VisionProcessor
 
@@ -145,32 +299,229 @@ class AQRuntimeAPIHandler(BaseHTTPRequestHandler):
                 is_vision = VisionProcessor.is_multimodal_payload(messages)
                 if is_vision:
                     formatted_prompt, images = VisionProcessor.extract_text_and_images(messages)
+                    is_vision_model = self.runtime.model_type(model_name) == "vision" if self.runtime else False
+                    if images and not is_vision_model:
+                        self._send_openai_error(400, "Selected model does not support image input.", code="unsupported_image_input")
+                        return
                     if images and any(v in model_name.lower() for v in ("vision", "moondream", "paligemma", "qwen2-vl")):
                         response_text = VisionProcessor.describe_image_simulated(images[0], formatted_prompt)
                         telemetry = {"tokens_per_second": 32.5, "latency_seconds": 0.08, "total_seconds": 0.35, "completion_tokens": 85}
                     else:
-                        engine = self.runtime.load_inference(model_name, persistent=True)
-                        response_text, telemetry = engine.generate_with_telemetry(formatted_prompt, max_tokens=max_tokens)
+                        engine = self.runtime.load_inference(model_name, persistent=True, provider=payload.get("provider"))
+                        with self.runtime.inference_lock():
+                            response_text, telemetry = engine.generate_with_telemetry(formatted_prompt, max_tokens=max_tokens)
                         engine.unload()
+                    if stream:
+                        self._send_sse_completion(model_name, response_text)
+                        return
                 else:
-                    last_user_prompt = ""
-                    for msg in reversed(messages):
-                        if msg.get("role") == "user":
-                            c = msg.get("content")
-                            if isinstance(c, str):
-                                last_user_prompt = c
-                            elif isinstance(c, list):
-                                for item in c:
-                                    if isinstance(item, dict) and item.get("type") == "text":
-                                        last_user_prompt = item.get("text", "")
-                            break
-
-                    if not last_user_prompt:
-                        self._send_json(400, {"error": "No user message found in 'messages'."})
+                    if not any(isinstance(m, dict) and m.get("role") == "user" for m in messages):
+                        self._send_openai_error(400, "No user message found in 'messages'.", code="invalid_messages")
                         return
 
-                    engine = self.runtime.load_inference(model_name, persistent=True)
-                    response_text, telemetry = engine.generate_with_telemetry(last_user_prompt, max_tokens=max_tokens)
+                    if tools:
+                        engine = self.runtime.load_inference(
+                            model_name,
+                            persistent=True,
+                            provider=payload.get("provider"),
+                        )
+                        content, tool_calls, telemetry = (
+                            engine.generate_messages_tool_calls_with_telemetry(
+                                messages,
+                                tools=tools,
+                                tool_choice=tool_choice,
+                                max_tokens=max_tokens,
+                            )
+                        )
+                        engine.unload()
+
+                        assistant_message = {"role": "assistant"}
+                        if content is not None:
+                            assistant_message["content"] = content
+                        else:
+                            assistant_message["content"] = None
+                        if tool_calls:
+                            assistant_message["tool_calls"] = tool_calls
+
+                        if stream:
+                            completion_id = f"chatcmpl-{int(time.time())}"
+                            created = int(time.time())
+                            self._begin_sse()
+                            if tool_calls:
+                                self._write_sse(
+                                    "data: "
+                                    + json.dumps(
+                                        {
+                                            "id": completion_id,
+                                            "object": "chat.completion.chunk",
+                                            "created": created,
+                                            "model": model_name,
+                                            "choices": [
+                                                {
+                                                    "index": 0,
+                                                    "delta": {
+                                                        "role": "assistant",
+                                                        "tool_calls": tool_calls,
+                                                    },
+                                                    "finish_reason": None,
+                                                }
+                                            ],
+                                        },
+                                        ensure_ascii=False,
+                                    )
+                                )
+                            else:
+                                self._write_sse(
+                                    "data: "
+                                    + json.dumps(
+                                        {
+                                            "id": completion_id,
+                                            "object": "chat.completion.chunk",
+                                            "created": created,
+                                            "model": model_name,
+                                            "choices": [
+                                                {
+                                                    "index": 0,
+                                                    "delta": {
+                                                        "role": "assistant",
+                                                        "content": content or "",
+                                                    },
+                                                    "finish_reason": None,
+                                                }
+                                            ],
+                                        },
+                                        ensure_ascii=False,
+                                    )
+                                )
+                            self._write_sse(
+                                "data: "
+                                + json.dumps(
+                                    {
+                                        "id": completion_id,
+                                        "object": "chat.completion.chunk",
+                                        "created": created,
+                                        "model": model_name,
+                                        "choices": [
+                                            {
+                                                "index": 0,
+                                                "delta": {},
+                                                "finish_reason": "tool_calls" if tool_calls else "stop",
+                                            }
+                                        ],
+                                    },
+                                    ensure_ascii=False,
+                                )
+                            )
+                            self._write_sse("data: [DONE]")
+                            return
+
+                        data = {
+                            "id": f"chatcmpl-{int(time.time())}",
+                            "object": "chat.completion",
+                            "created": int(time.time()),
+                            "model": model_name,
+                            "choices": [
+                                {
+                                    "index": 0,
+                                    "message": assistant_message,
+                                    "finish_reason": "tool_calls" if tool_calls else "stop",
+                                }
+                            ],
+                            "performance": telemetry,
+                        }
+                        self._send_json(200, data)
+                        return
+
+                    if stream:
+                        engine = self.runtime.load_inference(
+                            model_name,
+                            persistent=True,
+                            provider=payload.get("provider"),
+                        )
+                        completion_id = f"chatcmpl-{int(time.time())}"
+                        created = int(time.time())
+                        try:
+                            self._begin_sse()
+                            first = True
+                            accumulated = ""
+                            with self.runtime.inference_lock():
+                                for piece in engine.generate_messages_stream(messages, max_tokens=max_tokens):
+                                    if piece is None:
+                                        continue
+                                    text_piece = piece if isinstance(piece, str) else str(piece)
+                                    if not text_piece:
+                                        continue
+                                    accumulated += text_piece
+                                    delta = {"content": text_piece}
+                                    if first:
+                                        delta = {"role": "assistant", "content": text_piece}
+                                        first = False
+                                    self._write_sse(
+                                        "data: "
+                                        + json.dumps(
+                                            {
+                                                "id": completion_id,
+                                                "object": "chat.completion.chunk",
+                                                "created": created,
+                                                "model": model_name,
+                                                "choices": [
+                                                    {
+                                                        "index": 0,
+                                                        "delta": delta,
+                                                        "finish_reason": None,
+                                                    }
+                                                ],
+                                            },
+                                            ensure_ascii=False,
+                                        )
+                                    )
+                            self._write_sse(
+                                "data: "
+                                + json.dumps(
+                                    {
+                                        "id": completion_id,
+                                        "object": "chat.completion.chunk",
+                                        "created": created,
+                                        "model": model_name,
+                                        "choices": [
+                                            {
+                                                "index": 0,
+                                                "delta": {},
+                                                "finish_reason": "stop",
+                                            }
+                                        ],
+                                    },
+                                    ensure_ascii=False,
+                                )
+                            )
+                            self._write_sse("data: [DONE]")
+                        except Exception as error:
+                            self._write_sse(
+                                "data: "
+                                + json.dumps(
+                                    {
+                                        "error": {
+                                            "message": str(error),
+                                            "type": "server_error",
+                                            "code": "stream_failed",
+                                        }
+                                    },
+                                    ensure_ascii=False,
+                                )
+                            )
+                            self._write_sse("data: [DONE]")
+                        finally:
+                            engine.unload()
+                        return
+
+                    engine = self.runtime.load_inference(
+                        model_name,
+                        persistent=True,
+                        provider=payload.get("provider"),
+                    )
+                    response_text, telemetry = None, None
+                    with self.runtime.inference_lock():
+                        response_text, telemetry = engine.generate_messages_with_telemetry(messages, max_tokens=max_tokens)
                     engine.unload()
 
                 data = {
@@ -291,7 +642,10 @@ class AQRuntimeAPIHandler(BaseHTTPRequestHandler):
             if not session:
                 self._send_json(400, {"error": "Field 'session' is required."})
                 return
-            target = Path(f"memory_{session}_export.md")
+            import re
+            safe_session = re.sub(r"[^a-zA-Z0-9_-]", "-", str(session))
+            safe_session = re.sub(r"\.{2,}|-{2,}", "-", safe_session).strip("-") or "session"
+            target = Path(f"memory_{safe_session}_export.md")
             exported = self.runtime.memory_export(session, target) if self.runtime else False
             self._send_json(200, {"success": exported, "file": str(target.resolve())})
             return
@@ -307,7 +661,7 @@ def run_server(
 ) -> None:
     rt = runtime or RuntimeCore()
     AQRuntimeAPIHandler.runtime = rt
-    server = HTTPServer((host, port), AQRuntimeAPIHandler)
+    server = ThreadingHTTPServer((host, port), AQRuntimeAPIHandler)
     url = f"http://{host}:{port}/ui"
     print("==================================================================")
     print("               AQRuntime Desktop Control Center                   ")

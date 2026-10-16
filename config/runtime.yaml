@@ -1,5 +1,7 @@
-runtime_version: "2.4.0"
+runtime_version: 2.4.0
 default_model: null
-model_directory: "models"
-log_directory: "logs"
+model_directory: models
+log_directory: logs
 hf_token: null
+n_ctx: 4096
+max_cached_models: 1

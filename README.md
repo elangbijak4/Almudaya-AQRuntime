@@ -181,6 +181,32 @@ For detailed technical documentation, hardware setup guides, and development his
 
 ---
 
+## 🔌 Capability Status
+
+### Honest Feature Status
+
+- **Text chat / OpenAI-compatible API**: supported
+- **Streaming SSE**: supported
+- **Generic tool calling**: supported
+- **Document attachment with binary guard**: supported
+- **Max tokens and telemetry**: supported, throughput is estimated
+- **Voice STT**: API endpoint exists but transcription is still simulated
+- **TTS Read Aloud**: browser Web Speech
+- **Vision**: multimodal payload is parsed, image analysis is simulated
+- **Audio endpoint**: simulated but OpenAI-style multipart endpoint works
+
+## 🔌 OpenCode Compatibility
+
+AQRuntime now exposes an OpenAI-compatible API suitable for local use with OpenCode:
+
+- `/v1/chat/completions` with streaming
+- full multi-turn messages
+- optional generic tool/function calling adapter
+- `/v1/audio/transcriptions` multipart endpoint
+- `/v1/models` chat-only model catalog with capabilities
+
+See `docs/OPENCODE_COMPATIBILITY_PATCHES.md` for full patch and test details.
+
 ## 🧪 Testing & Verification
 
 Run the automated acceptance test suite to verify 100% system integrity:

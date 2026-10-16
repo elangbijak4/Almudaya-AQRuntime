@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 import tempfile
+from types import ModuleType
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -111,6 +112,32 @@ class GGUFTests(unittest.TestCase):
             gguf_file.write_bytes(b"GGUF_TEST_HEADER")
             self.assertTrue(GGUFModelLoader.is_gguf_dir(path))
             self.assertEqual(GGUFModelLoader.find_gguf_file(path), gguf_file)
+
+    def test_gguf_loader_uses_real_local_backend(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            model_dir = Path(tmpdir)
+            model_file = model_dir / "gemma-Q4_K_M.gguf"
+            model_file.write_bytes(b"GGUF_TEST_HEADER")
+
+            llama_cpp = ModuleType("llama_cpp")
+            llama_cpp.Llama = MagicMock(side_effect=RuntimeError("llama-cpp unavailable"))
+            ctransformers = ModuleType("ctransformers")
+            auto_model = MagicMock()
+            auto_model.from_pretrained.return_value = MagicMock()
+            ctransformers.AutoModelForCausalLM = auto_model
+
+            with patch.dict("sys.modules", {"llama_cpp": llama_cpp, "ctransformers": ctransformers}):
+                tokenizer, model = GGUFModelLoader.load_gguf(model_dir, n_ctx=512)
+
+            auto_model.from_pretrained.assert_called_once_with(
+                str(model_dir),
+                model_file=model_file.name,
+                model_type="gemma",
+                context_length=512,
+                local_files_only=True,
+            )
+            self.assertNotIsInstance(model, SimulatedGGUFModel)
+            self.assertNotIsInstance(tokenizer, SimulatedGGUFModel)
 
     def test_gguf_hardware_capacity(self) -> None:
         detector = HardwareDetector()
@@ -267,8 +294,9 @@ class HardwareAndCatalogTests(unittest.TestCase):
         self.assertTrue(AudioProcessor.is_supported_audio("voice.wav"))
         self.assertTrue(AudioProcessor.is_supported_audio("recording.mp3"))
         result = AudioProcessor.transcribe_audio_payload("dummybase64data", "sample.wav")
-        self.assertEqual(result["status"], "success")
+        self.assertEqual(result["status"], "simulated")
         self.assertIn("text", result)
+        self.assertIn("not a real Whisper", result["note"])
 
     def test_max_tokens_configuration(self) -> None:
         model = SimulatedGGUFModel(Path("models/bartowski-gemma-2-2b-it-gguf"))

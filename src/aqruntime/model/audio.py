@@ -24,10 +24,11 @@ class AudioProcessor:
         transcribed_text = f"[Suara Ter-Transkripsi]: Halo AQRuntime, ini adalah pesan suara yang saya rekam secara langsung."
 
         return {
-            "status": "success",
+            "status": "simulated",
             "filename": filename,
             "format": ext.upper(),
             "size_kb": size_kb,
             "text": transcribed_text,
-            "model_used": "openai/whisper-tiny (Local Speech Engine)",
+            "model_used": "AQRuntime simulated speech engine",
+            "note": "This endpoint currently returns a simulated transcription, not a real Whisper inference result.",
         }

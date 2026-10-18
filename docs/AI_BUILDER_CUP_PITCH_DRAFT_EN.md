@@ -21,58 +21,54 @@ Teams often need a specific answer from a policy, guide, or project document. Ma
 
 AQRuntime WorkDoc lets a user:
 
-1. Attach one readable text document.
-2. Ask a question in natural language.
-3. Receive an answer grounded in the most relevant passages.
+1. Attach a work document (`.pdf`, `.docx`, `.rtf`, `.txt`, `.md`, `.csv`, `.json`, or source code) or load the built-in 1-click sample policy.
+2. Ask specific questions, request summaries, or hold an interactive multi-turn discussion in English or Bahasa Indonesia.
+3. Receive answers grounded in retrieved passages with exact `[S1]` source citations.
 4. Inspect each retrieved excerpt and its character range in the original text.
 
-If no relevant passage is found, WorkDoc says so. If the model omits a recognized citation, the response is marked unverified.
+If a specific factual topic is not in the document, WorkDoc explicitly states that the document does not mention it rather than guessing.
 
 ## Slide 4 — Product demo
 
-Use the synthetic sample document `workdoc_demo_sample.md`.
+Use the live Cloud Run URL (`https://aqruntime-workdoc-cvtcvsvijq-et.a.run.app/workdoc`) and click **“📋 Load sample travel & expense policy (1-click demo)”** (or upload a `.pdf` / `.docx` file).
 
-**Question 1:** “What approval is required for a trip estimated to cost USD 1,800?”
+**Step 1 (Grounded Q&A):** Click *“Approval for USD 1,800 trip?”* → Shows the grounded answer citing `[S1]` (trips above USD 1,500 require department-director approval) along with the exact source excerpt and character offsets.
 
-Show the answer citing the passage that says trips above USD 1,500 also need department-director approval, plus the source excerpt and character range.
+**Step 2 (Multi-turn & Bilingual Discussion):** Ask a follow-up question or click *“Diskusikan dalam Bahasa Indonesia”* → Shows interactive multi-turn document discussion with context retention.
 
-**Question 2:** “What is the reimbursement limit for international roaming?”
-
-Show that the document has no matching passage and WorkDoc does not invent an answer.
+**Step 3 (Anti-Hallucination Guardrail):** Click *“International roaming limit?”* → Shows that WorkDoc refuses to invent a number when the topic is absent from the document.
 
 ## Slide 5 — How it works
 
-**Browser → WorkDoc API → Passage retrieval → Selected model → Answer + source excerpts**
+**Browser → WorkDoc Extract & Ask API → Bilingual & Contextual Passage Retrieval → Google Gemma 2 2B / Gemini → Answer + Source Excerpts**
 
-- The API splits the uploaded text into overlapping passages.
-- Lexical BM25-style scoring selects up to four relevant excerpts.
-- The selected model is instructed to answer only from those excerpts and cite markers such as `[S1]`.
-- The interface displays the answer, citation status, and source offsets.
-
-The prototype uses a quantized Gemma 2 2B GGUF model. Google Antigravity was used as the agentic coding platform during development.
+- Automatic text extractor parses `.pdf`, `.docx`, `.rtf`, and text/code files into clean UTF-8 text.
+- Overlapping passage chunking + lexical BM25 scoring with bilingual synonym expansion and multi-turn conversation history selects the most relevant excerpts.
+- The selected Google AI model (**Google Gemma 2 2B IT GGUF** embedded in Cloud Run, with optional **Google Gemini** hybrid support) answers from those excerpts and cites markers such as `[S1]`.
+- Built with **Google Antigravity** as the agentic coding platform and deployed on **Google Cloud Run**.
 
 ## Slide 6 — Why this approach
 
-- **Inspectable:** users can compare the answer with retrieved source text.
-- **Focused:** the prototype addresses one concrete document workflow.
-- **Flexible runtime:** AQRuntime can use a model installed on the chosen runtime.
-- **Practical scope:** one text file and a small set of evidence passages keep the demo understandable.
+- **Inspectable:** users can compare every answer with retrieved source text and character offsets.
+- **Interactive:** supports both strict factual Q&A and multi-turn document discussion across English and Bahasa Indonesia.
+- **Dual-Mode Runtime (Cloud + Local):** runs self-contained on **Google Cloud Run** for instant browser access and 100% offline on local PCs (CPU/GPU/NPU).
+- **Broad Document Support:** handles everyday `.pdf`, `.docx`, `.txt`, `.md`, `.csv`, and code files up to 5 MB.
 
 ## Slide 7 — Intended users and expected value
 
-**Intended users:** small teams that need to find answers in policies, operating guides, or project notes.
+**Intended users:** teams, researchers, and enterprises that need to review, discuss, and verify answers from policies, operating guides, or technical documents.
 
-**Expected value to validate:** reduce the effort of locating relevant passages and make AI-generated document answers easier to review.
+**Expected value to validate:** reduce the effort of locating relevant passages and make AI-generated document answers easier to audit and verify.
 
 No measured productivity or accuracy claims are made yet. These need to be evaluated with representative users and documents.
 
 ## Slide 8 — Technical status and next steps
 
-- AQRuntime is the pre-existing runtime foundation; AQRuntime WorkDoc is the competition-period workflow developed on top of it.
-- The local prototype has a dedicated WorkDoc page at `/workdoc`, separate from the existing AQRuntime Control Center at `/ui`; it supports text/code attachments and source excerpts.
-- **Cloud Run demo URL (WorkDoc):** `https://aqruntime-workdoc-cvtcvsvijq-et.a.run.app/workdoc`
-- **Cloud Run Control Center URL:** `https://aqruntime-workdoc-cvtcvsvijq-et.a.run.app/ui`
-- **Status:** Cloud Run container deployed and verified end-to-end with embedded Google Gemma 2 2B IT GGUF (`bartowski/gemma-2-2b-it-GGUF`) and 1-click sample document grounding (`[S1]` source citations).
+- AQRuntime is the pre-existing runtime foundation; **AQRuntime WorkDoc** is the competition-period interactive document workflow developed on top of it.
+- **Live Cloud Run WorkDoc URL:** `https://aqruntime-workdoc-cvtcvsvijq-et.a.run.app/workdoc`
+- **Live Cloud Run Control Center URL:** `https://aqruntime-workdoc-cvtcvsvijq-et.a.run.app/ui`
+- **Public GitHub Repository:** `https://github.com/elangbijak4/Almudaya-AQRuntime`
+- **Status:** Deployed and verified end-to-end on Google Cloud Run (`asia-southeast2`) with embedded Google Gemma 2 2B IT GGUF, multi-turn discussion, PDF/DOCX extraction, and 49/49 passing acceptance tests.
 
 Do not remove the provenance statement. The organizer's clarification says the new solution must show substantial development during the hackathon and that final eligibility is determined during evaluation.
 

@@ -252,6 +252,39 @@ class AQRuntimeAPIHandler(BaseHTTPRequestHandler):
         if not isinstance(payload, dict):
             payload = {}
 
+        if path == "/api/workdoc/extract":
+            from aqruntime.workdoc import extract_document_text
+
+            filename = str(payload.get("filename") or "document.txt")[:180]
+            file_b64 = payload.get("file_base64")
+            if not isinstance(file_b64, str) or not file_b64.strip():
+                self._send_openai_error(400, "Field 'file_base64' is required.", code="missing_file")
+                return
+            try:
+                if "," in file_b64 and file_b64.strip().startswith("data:"):
+                    file_b64 = file_b64.split(",", 1)[1]
+                raw_bytes = base64.b64decode(file_b64)
+            except Exception:
+                self._send_openai_error(400, "Invalid base64 file payload.", code="invalid_base64")
+                return
+            if len(raw_bytes) > 5 * 1024 * 1024:
+                self._send_openai_error(413, "File exceeds the 5 MB upload limit.", code="file_too_large")
+                return
+            try:
+                extracted = extract_document_text(raw_bytes, filename)
+            except ValueError as exc:
+                self._send_openai_error(400, str(exc), code="extraction_failed")
+                return
+            except Exception:
+                self._send_openai_error(500, "Could not extract text from this document.", error_type="server_error", code="extraction_error")
+                return
+            self._send_json(200, {
+                "filename": filename,
+                "document_text": extracted,
+                "char_count": len(extracted),
+            })
+            return
+
         if path == "/api/workdoc/ask":
             from aqruntime.workdoc import (
                 MAX_DOCUMENT_CHARS,

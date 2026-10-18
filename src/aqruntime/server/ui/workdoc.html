@@ -73,9 +73,9 @@ button:disabled{opacity:.55;cursor:wait}
 <p class="hint">Select an active runtime model and attach a document to start an interactive session.</p>
 <label for="model">Runtime model</label>
 <select id="model"><option value="">Loading models…</option></select>
-<label class="filebox">📄 &nbsp; Choose a text file<input id="file" type="file" accept=".txt,.md,.py,.json,.log,.csv,.c,.cpp,.h"></label>
+<label class="filebox">📄 &nbsp; Choose a document (.pdf, .docx, .txt, .md, .csv, .json, code)<input id="file" type="file" accept=".pdf,.docx,.rtf,.txt,.md,.py,.json,.yaml,.yml,.xml,.html,.js,.ts,.sql,.log,.csv,.c,.cpp,.h"></label>
 <div style="margin-top:8px"><button id="sample" class="secondary" type="button" style="width:100%;padding:9px 12px;font-size:13px">📋 Load sample travel &amp; expense policy (1-click demo)</button></div>
-<div id="filename" class="filename">No document selected · up to 2 MB (100,000 characters used)</div>
+<div id="filename" class="filename">No document selected · PDF, Word (.docx), Text, Markdown, CSV, JSON, Code (up to 5 MB)</div>
 <details id="doc-preview-box" class="doc-preview" style="display:none"><summary>👁️ Inspect document text</summary><pre id="doc-preview-text"></pre></details>
 <label style="margin-top:16px">💡 Try a prompt (1-click)</label>
 <div id="chips" class="chips">
@@ -164,23 +164,62 @@ async function loadSampleDoc(populateQuestion=true){
 
 sampleButton.addEventListener('click',()=>loadSampleDoc(true));
 
+function readFileAsDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(String(reader.result||''));
+    reader.onerror=()=>reject(new Error('Could not read file.'));
+    reader.readAsDataURL(file);
+  });
+}
+
 fileInput.addEventListener('change',async()=>{
   const f=fileInput.files&&fileInput.files[0];
   if(!f)return;
   documentText='';selectedName='';
-  if(f.size>2*1024*1024){fileName.textContent='File exceeds the 2 MB limit.';fileInput.value='';return}
+  if(f.size>5*1024*1024){fileName.textContent='File exceeds the 5 MB limit.';fileInput.value='';return}
+  const lower=(f.name||'').toLowerCase();
+  const needsBackendExtract=lower.endsWith('.pdf')||lower.endsWith('.docx')||lower.endsWith('.rtf');
   try{
-    const text=await f.text();
-    if(text.includes('\u0000'))throw new Error('This file appears to be binary. Choose a text-based file.');
-    documentText=text.slice(0,100000);
+    setStatus('Reading document…','');
+    fileName.textContent=`Extracting text from ${f.name}…`;
+    let extracted='';
+    if(needsBackendExtract){
+      const dataUrl=await readFileAsDataURL(f);
+      const res=await fetch('/api/workdoc/extract',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({filename:f.name,file_base64:dataUrl})
+      });
+      const data=await res.json();
+      if(!res.ok)throw new Error(data.error?.message||data.error||'Could not extract document text.');
+      extracted=data.document_text||'';
+    }else{
+      const rawText=await f.text();
+      if(rawText.includes('\u0000')){
+        const dataUrl=await readFileAsDataURL(f);
+        const res=await fetch('/api/workdoc/extract',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({filename:f.name,file_base64:dataUrl})
+        });
+        const data=await res.json();
+        if(!res.ok)throw new Error(data.error?.message||data.error||'Unsupported binary file.');
+        extracted=data.document_text||'';
+      }else{
+        extracted=rawText;
+      }
+    }
+    documentText=extracted.slice(0,100000);
     selectedName=f.name;
     chatHistory=[];
     updateTurnCounter();
-    fileName.textContent=`${f.name} · ${documentText.length.toLocaleString()} characters${text.length>documentText.length?' (first 100,000 used)':''}`;
+    fileName.textContent=`${f.name} · ${documentText.length.toLocaleString()} characters extracted`;
     showPreview(documentText);
     setStatus('Document ready','good');
   }catch(e){
     fileName.textContent=e.message||'Could not read file.';
+    setStatus('File error','warn');
     fileInput.value='';
   }
 });

@@ -478,6 +478,30 @@ class WorkDocTests(unittest.TestCase):
         self.assertEqual(mode_disc, "discussion")
         self.assertGreater(len(sources_disc), 0)
 
+    def test_docx_and_pdf_extraction(self) -> None:
+        import io
+        import zipfile
+        from aqruntime.workdoc import extract_document_text
+
+        # 1. Synthetic .docx archive
+        docx_buf = io.BytesIO()
+        with zipfile.ZipFile(docx_buf, "w") as zf:
+            zf.writestr(
+                "word/document.xml",
+                '<?xml version="1.0" encoding="UTF-8"?>'
+                '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+                "<w:body><w:p><w:r><w:t>Hello from Word DOCX policy!</w:t></w:r></w:p></w:body>"
+                "</w:document>",
+            )
+        extracted_docx = extract_document_text(docx_buf.getvalue(), "policy.docx")
+        self.assertIn("Hello from Word DOCX policy!", extracted_docx)
+
+        # 2. Synthetic uncompressed PDF stream
+        pdf_bytes = b"%PDF-1.4\n1 0 obj\n<< /Length 44 >>\nstream\nBT /F1 12 Tf 72 712 Td (Hello from PDF document!) Tj ET\nendstream\nendobj\n%%EOF"
+        extracted_pdf = extract_document_text(pdf_bytes, "guide.pdf")
+        self.assertIn("Hello from PDF document!", extracted_pdf)
+
+
 
 
 class ProviderManagerTests(unittest.TestCase):

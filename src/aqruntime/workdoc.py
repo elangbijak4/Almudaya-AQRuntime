@@ -329,3 +329,156 @@ def load_sample_document() -> dict:
         ],
     }
 
+
+def _extract_docx_bytes(file_bytes: bytes) -> str:
+    """Extract readable text from a .docx file using Python's standard library."""
+    import io
+    import xml.etree.ElementTree as ET
+    import zipfile
+
+    try:
+        with zipfile.ZipFile(io.BytesIO(file_bytes)) as archive:
+            if "word/document.xml" not in archive.namelist():
+                raise ValueError("Invalid .docx file: missing word/document.xml.")
+            xml_bytes = archive.read("word/document.xml")
+    except zipfile.BadZipFile as exc:
+        raise ValueError("Could not read .docx archive. Ensure it is a valid Word (.docx) file.") from exc
+
+    root = ET.fromstring(xml_bytes)
+    paragraphs: list[str] = []
+    for elem in root.iter():
+        tag = elem.tag.rsplit("}", 1)[-1]
+        if tag == "p":
+            runs: list[str] = []
+            for child in elem.iter():
+                child_tag = child.tag.rsplit("}", 1)[-1]
+                if child_tag == "t" and child.text:
+                    runs.append(child.text)
+                elif child_tag in ("tab",):
+                    runs.append("\t")
+                elif child_tag in ("br", "cr"):
+                    runs.append("\n")
+            line = "".join(runs).strip()
+            if line:
+                paragraphs.append(line)
+    text = "\n\n".join(paragraphs).strip()
+    if not text:
+        raise ValueError("No readable text was found inside this .docx file.")
+    return text
+
+
+def _decode_pdf_literal(raw: bytes) -> str:
+    out = bytearray()
+    i = 0
+    n = len(raw)
+    while i < n:
+        ch = raw[i]
+        if ch == 92 and i + 1 < n:  # backslash
+            nxt = raw[i + 1]
+            if nxt in (110,):  # \n
+                out.append(10)
+                i += 2
+            elif nxt in (114,):  # \r
+                out.append(10)
+                i += 2
+            elif nxt in (116,):  # \t
+                out.append(9)
+                i += 2
+            elif 48 <= nxt <= 55:  # octal \ddd
+                oct_digits = bytes([nxt])
+                i += 2
+                for _ in range(2):
+                    if i < n and 48 <= raw[i] <= 55:
+                        oct_digits += bytes([raw[i]])
+                        i += 1
+                    else:
+                        break
+                out.append(int(oct_digits, 8) & 0xFF)
+            else:
+                out.append(nxt)
+                i += 2
+        else:
+            out.append(ch)
+            i += 1
+    return out.decode("latin-1", errors="ignore")
+
+
+def _extract_pdf_bytes(file_bytes: bytes) -> str:
+    """Extract text from a PDF using pypdf when installed or a stdlib stream fallback."""
+    import io
+    import zlib
+
+    # 1. Preferred: pypdf / PyPDF2 if installed
+    for mod_name in ("pypdf", "PyPDF2"):
+        try:
+            pdf_mod = __import__(mod_name)
+            reader = pdf_mod.PdfReader(io.BytesIO(file_bytes))
+            pages_text: list[str] = []
+            for page in reader.pages:
+                page_txt = (page.extract_text() or "").strip()
+                if page_txt:
+                    pages_text.append(page_txt)
+            joined = "\n\n".join(pages_text).strip()
+            if joined:
+                return joined
+        except Exception:
+            pass
+
+    # 2. Pure-Python stdlib fallback for standard PDF text streams
+    streams: list[bytes] = [file_bytes]
+    for match in re.finditer(rb"stream[\r\n]+(.*?)[\r\n]+endstream", file_bytes, flags=re.DOTALL):
+        raw_stream = match.group(1)
+        for wbits in (zlib.MAX_WBITS, -zlib.MAX_WBITS):
+            try:
+                streams.append(zlib.decompress(raw_stream, wbits))
+                break
+            except Exception:
+                continue
+
+    fragments: list[str] = []
+    for data in streams:
+        for bt_block in re.findall(rb"BT\s+(.*?)\s+ET", data, flags=re.DOTALL):
+            for token in re.findall(rb"\((?:\\.|[^\\()])*\)", bt_block):
+                decoded = _decode_pdf_literal(token[1:-1]).strip()
+                if decoded:
+                    fragments.append(decoded)
+    text = " ".join(fragments).strip()
+    if not text:
+        raise ValueError("Could not extract selectable text from this PDF (it may be a scanned image PDF).")
+    return text
+
+
+def extract_document_text(file_bytes: bytes, filename: str) -> str:
+    """Extract clean UTF-8 text from .docx, .pdf, .rtf, or text/code files."""
+    if not file_bytes:
+        raise ValueError("Uploaded file is empty.")
+    lower_name = (filename or "").lower().strip()
+    if lower_name.endswith(".docx") or file_bytes[:4] == b"PK\x03\x04":
+        if lower_name.endswith(".doc"):
+            raise ValueError("Legacy binary .doc is not supported; please save as .docx, .pdf, or .txt.")
+        return _extract_docx_bytes(file_bytes)[:MAX_DOCUMENT_CHARS]
+    if lower_name.endswith(".pdf") or file_bytes.startswith(b"%PDF"):
+        return _extract_pdf_bytes(file_bytes)[:MAX_DOCUMENT_CHARS]
+    if lower_name.endswith(".rtf") or file_bytes.startswith(b"{\\rtf"):
+        raw_rtf = file_bytes.decode("latin-1", errors="ignore")
+        cleaned = re.sub(r"\\par[d]?\b", "\n", raw_rtf)
+        cleaned = re.sub(r"\\'[0-9a-fA-F]{2}", "", cleaned)
+        cleaned = re.sub(r"\\[a-zA-Z]+-?\d*\s?", "", cleaned)
+        cleaned = cleaned.replace("{", "").replace("}", "").strip()
+        if not cleaned:
+            raise ValueError("No readable text found in .rtf file.")
+        return cleaned[:MAX_DOCUMENT_CHARS]
+
+    if b"\x00" in file_bytes[:4096]:
+        raise ValueError("This file appears to be an unsupported binary format. Choose a .pdf, .docx, .txt, .md, .csv, .json, or code file.")
+
+    for encoding in ("utf-8-sig", "utf-8", "cp1252", "latin-1"):
+        try:
+            text = file_bytes.decode(encoding)
+            if text.strip():
+                return text[:MAX_DOCUMENT_CHARS]
+        except UnicodeDecodeError:
+            continue
+    raise ValueError("Could not decode text from file.")
+
+

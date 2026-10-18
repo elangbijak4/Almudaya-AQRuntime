@@ -14,7 +14,7 @@ RUN apt-get update \
 # Keep the Cloud Run image focused on the GGUF CPU path; PyTorch is not needed
 # for this prototype and would make the image substantially larger.
 RUN python -m pip install --no-cache-dir --upgrade pip \
-    && python -m pip install --no-cache-dir PyYAML typer huggingface_hub llama-cpp-python
+    && python -m pip install --no-cache-dir PyYAML typer huggingface_hub llama-cpp-python pypdf
 
 # The quantized Gemma model is fetched during image build, not committed to Git.
 RUN python -c "from huggingface_hub import hf_hub_download; hf_hub_download(repo_id='bartowski/gemma-2-2b-it-GGUF', filename='gemma-2-2b-it-Q4_K_M.gguf', local_dir='models/bartowski-gemma-2-2b-it-gguf')"

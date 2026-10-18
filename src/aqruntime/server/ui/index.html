@@ -459,7 +459,7 @@
           </div>
 
           <div class="chat-input-area">
-            <input type="file" id="file-input" style="display: none;" onchange="handleFileSelected(event)" accept=".txt,.py,.json,.md,.log,.csv,.c,.cpp,.h">
+            <input type="file" id="file-input" style="display: none;" onchange="handleFileSelected(event)" accept=".pdf,.docx,.rtf,.txt,.py,.json,.yaml,.yml,.xml,.html,.js,.ts,.sql,.md,.log,.csv,.c,.cpp,.h">
             <input type="file" id="image-input" style="display: none;" onchange="handleImageSelected(event)" accept="image/*">
             <button class="btn-action" style="padding: 12px 14px; font-size: 1.1rem;" title="Attach a work document for source-grounded Q&A" onclick="document.getElementById('file-input').click()">📎</button>
             <button class="btn-action" style="padding: 12px 14px; font-size: 1.1rem; background: rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.4);" title="Attach Image for Vision AI" onclick="document.getElementById('image-input').click()">🖼️</button>
@@ -712,28 +712,53 @@
       document.getElementById('image-attachment-preview').style.display = 'none';
     }
 
-    function handleFileSelected(event) {
+    async function handleFileSelected(event) {
       const file = event.target.files[0];
       if (!file) return;
-      if (file.size > 2 * 1024 * 1024) {
-        alert('For this prototype, attach a text file smaller than 2 MB.');
+      if (file.size > 5 * 1024 * 1024) {
+        alert('For this prototype, attach a document smaller than 5 MB.');
         clearFileAttachment();
         return;
       }
 
       const ext = file.name.split('.').pop().toLowerCase();
-      if (['docx', 'doc', 'pdf', 'zip', 'exe', 'png', 'jpg', 'jpeg', 'xlsx'].includes(ext)) {
-        alert(`⚠️ Berkas '${file.name}' adalah berkas biner/dokumen terkompresi (.${ext}).\n\nFitur attachment saat ini dirancang untuk membaca Berkas Teks Polos (.txt, .md, .py, .json, .csv, .log).\n\n👉 Solusi: Silakan simpan berkas Word Anda sebagai 'Plain Text (.txt)' atau 'Markdown (.md)' sebelum melampirkannya.`);
+      if (['doc', 'zip', 'exe', 'png', 'jpg', 'jpeg', 'xlsx'].includes(ext)) {
+        alert(`⚠️ Berkas '${file.name}' (.${ext}) belum didukung sebagai dokumen teks.\n\nFormat yang didukung: PDF (.pdf), Word (.docx), RTF (.rtf), dan berkas teks/kode (.txt, .md, .py, .json, .csv, .yaml, .xml, .html, .log).`);
         clearFileAttachment();
         return;
       }
 
       attachedFileName = file.name;
+      if (['pdf', 'docx', 'rtf'].includes(ext)) {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          try {
+            document.getElementById('file-attachment-name').innerText = `${file.name} · Extracting text...`;
+            document.getElementById('file-attachment-preview').style.display = 'block';
+            const res = await fetch('/api/workdoc/extract', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filename: file.name, file_base64: e.target.result || '' })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error((data.error && data.error.message) || data.error || 'Could not extract text.');
+            attachedFileContent = data.document_text || '';
+            document.getElementById('file-attachment-name').innerText = `${file.name} (${(file.size / 1024).toFixed(1)} KB · ${attachedFileContent.length.toLocaleString()} chars) · WorkDoc Q&A ready`;
+            userInput.placeholder = 'Ask a question or discuss the attached document...';
+          } catch (err) {
+            alert(err.message || 'Gagal mengekstrak teks dokumen.');
+            clearFileAttachment();
+          }
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = function(e) {
         let text = e.target.result || '';
         if (text.startsWith('PK\x03\x04') || /[\x00-\x08\x0E-\x1F]/.test(text.substring(0, 100))) {
-          alert(`⚠️ Berkas '${file.name}' terdeteksi berisi data biner terkompresi.\n\nSilakan gunakan berkas Teks Polos (.txt, .md, .py, .json, .csv, .log).`);
+          alert(`⚠️ Berkas '${file.name}' terdeteksi berisi data biner.\n\nSilakan gunakan berkas PDF (.pdf), Word (.docx), atau Teks Polos (.txt, .md, .py, .json, .csv, .log).`);
           clearFileAttachment();
           return;
         }

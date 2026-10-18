@@ -120,13 +120,24 @@ class AQRuntimeAPIHandler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
         self.end_headers()
 
+    def _resolve_ui_file(self, filename: str) -> Path:
+        candidates = [
+            Path(__file__).resolve().parent / "ui" / filename,
+            Path(os.environ.get("AQRUNTIME_HOME", ".")).resolve() / "src" / "aqruntime" / "server" / "ui" / filename,
+            Path.cwd().resolve() / "src" / "aqruntime" / "server" / "ui" / filename,
+        ]
+        for candidate in candidates:
+            if candidate.exists():
+                return candidate
+        return candidates[0]
+
     def do_GET(self) -> None:
         parsed_url = urllib.parse.urlparse(self.path)
         path = parsed_url.path
         query_params = urllib.parse.parse_qs(parsed_url.query)
 
         if path in ("/", "/ui", "/ui/index.html"):
-            ui_file = Path(__file__).parent / "ui" / "index.html"
+            ui_file = self._resolve_ui_file("index.html")
             if ui_file.exists():
                 with ui_file.open("r", encoding="utf-8") as stream:
                     self._send_html(200, stream.read())
@@ -135,7 +146,7 @@ class AQRuntimeAPIHandler(BaseHTTPRequestHandler):
             return
 
         if path in ("/workdoc", "/workdoc/", "/workdoc/index.html"):
-            ui_file = Path(__file__).parent / "ui" / "workdoc.html"
+            ui_file = self._resolve_ui_file("workdoc.html")
             if ui_file.exists():
                 with ui_file.open("r", encoding="utf-8") as stream:
                     self._send_html(200, stream.read())

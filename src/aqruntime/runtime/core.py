@@ -3,6 +3,7 @@
 import logging
 import os
 import threading
+from hashlib import sha256
 from collections import OrderedDict
 from contextlib import contextmanager
 from pathlib import Path
@@ -77,12 +78,33 @@ class RuntimeCore:
         return self.storage.list_models()
 
     def list_chat_models(self) -> list[str]:
-        return self.storage.list_chat_models()
+        local_models = self.storage.list_chat_models()
+        from aqruntime.providers import gemini
+
+        cloud_models = [m for m in gemini.available_models() if m not in local_models]
+        return local_models + cloud_models
 
     def model_type(self, model: str) -> str:
+        from aqruntime.providers import gemini
+
+        if gemini.is_gemini_model(model):
+            return "text"
         return self.storage.classify_model(model)
 
     def model_capabilities(self, model: str) -> dict:
+        from aqruntime.providers import gemini
+
+        if gemini.is_gemini_model(model):
+            return {
+                "type": "text",
+                "chat": True,
+                "streaming": True,
+                "tools": True,
+                "vision": True,
+                "audio_transcription": False,
+                "embedding": False,
+                "provider": "gemini-cloud",
+            }
         return self.storage.model_capabilities(model)
 
     def load_inference(
@@ -92,7 +114,24 @@ class RuntimeCore:
         session_name: str | None = None,
         system_prompt: str | None = None,
         provider: str | None = None,
+        cache_model: bool = False,
     ) -> InferenceEngine:
+        from aqruntime.providers import gemini
+
+        if gemini.is_gemini_model(model) and gemini.is_configured():
+            clean_model = model.strip()
+            tokenizer, language_model = gemini.load_gemini_adapter(clean_model)
+            s_name = session_name or self.storage.model_name(clean_model)
+            self.logger.info("Model loading: %s via gemini-cloud", clean_model)
+            return InferenceEngine(
+                tokenizer,
+                language_model,
+                memory_manager=self.memory,
+                session_name=s_name,
+                persistent=persistent,
+                system_prompt=system_prompt,
+            )
+
         path = self.storage.path_for(model)
         if not path.is_dir():
             raise FileNotFoundError("Model not found.")
@@ -100,21 +139,25 @@ class RuntimeCore:
             raise ValueError(f"Model '{model}' is not a chat model. Type: {self.model_type(model)}.")
         GGUFModelLoader.default_n_ctx = self.settings.n_ctx
 
-        cacheable = (
-            self.settings.max_cached_models > 0
-            and persistent
-            and session_name is None
-            and system_prompt is None
-        )
-        cache_key = None
-        if cacheable:
-            cache_key = f"{provider or 'auto'}::{model}"
+        canonical_model = self.storage.model_name(model)
+        cacheable = self.settings.max_cached_models > 0
+        cache_key = f"{provider or 'auto'}::{canonical_model}" if cacheable else None
+        s_name = session_name or canonical_model
 
         with self._cache_lock:
             if cache_key is not None and cache_key in self._inference_cache:
-                engine = self._inference_cache[cache_key]
+                cached_entry = self._inference_cache[cache_key]
                 self._inference_cache.move_to_end(cache_key)
                 self.logger.info("Reusing warm inference cache: %s", cache_key)
+                engine = InferenceEngine(
+                    cached_entry.tokenizer,
+                    cached_entry.model,
+                    memory_manager=self.memory,
+                    session_name=s_name,
+                    persistent=persistent,
+                    system_prompt=system_prompt,
+                )
+                setattr(engine, "_cached", True)
                 return engine
 
         selected_provider = self.providers.resolve_provider(provider, path)
@@ -126,7 +169,6 @@ class RuntimeCore:
                 selected_provider.name,
             )
         self.logger.info("Model loading: %s via %s", model, selected_provider.name)
-        s_name = session_name or self.storage.model_name(model)
         engine = InferenceEngine(
             tokenizer,
             language_model,

@@ -87,6 +87,18 @@ class GGUFTokenizerWrapper:
     def __call__(self, text, **kwargs):
         return {"input_ids": [1]}
 
+    def encode(self, text: str, **kwargs) -> list[int]:
+        if not text:
+            return []
+        if hasattr(self.llm, "tokenize"):
+            try:
+                tokens = self.llm.tokenize(text.encode("utf-8"))
+                if isinstance(tokens, (list, tuple)):
+                    return list(tokens)
+            except Exception:
+                pass
+        return [1] * max(1, len(text.split()))
+
     def decode(self, token_ids, **kwargs):
         return str(token_ids)
 
@@ -123,9 +135,9 @@ class GGUFModelWrapper:
     def generate_text_stream(self, formatted_prompt: str, max_tokens: int = 512):
         try:
             if hasattr(self.llm, "create_completion"):
-                chunks = self.llm(formatted_prompt, max_tokens=max_tokens, stream=True, stop=["<end_of_turn>", "User:", "System:", "\\n\\nUser:"])
+                chunks = self.llm(formatted_prompt, max_tokens=max_tokens, stream=True, stop=["<end_of_turn>", "User:", "System:", "\n\nUser:"])
             else:
-                chunks = self.llm(formatted_prompt, max_new_tokens=max_tokens, stream=True, stop=["<end_of_turn>", "User:", "System:", "\\n\\nUser:"])
+                chunks = self.llm(formatted_prompt, max_new_tokens=max_tokens, stream=True, stop=["<end_of_turn>", "User:", "System:", "\n\nUser:"])
             for chunk in chunks:
                 if isinstance(chunk, dict):
                     choices = chunk.get("choices", [])

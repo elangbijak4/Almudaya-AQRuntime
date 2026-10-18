@@ -133,6 +133,19 @@ class CatalogManager:
                     cached = json.load(stream)
             except Exception:
                 cached = []
+        # Older cache entries may have used the generic 3B fallback for
+        # model IDs expressed in millions (for example, facebook/opt-125m).
+        # Refresh only generic Hugging Face entries so curated estimates stay intact.
+        for item in cached:
+            repo_id = item.get("repo_id", "")
+            description = item.get("description", "")
+            if description.startswith("Hugging Face "):
+                match = re.search(r"(\d+(?:\.\d+)?)\s*([bm])", repo_id, re.IGNORECASE)
+                if match:
+                    size = float(match.group(1))
+                    param_size = size / 1000 if match.group(2).lower() == "m" else size
+                    item["param_size_b"] = param_size
+                    item["est_ram_gb"] = round(param_size * 2.2, 1)
         # Merge default NVIDIA, Vision, and Audio models into cache
         cached_repos = {item["repo_id"] for item in cached}
         for n_model in NVIDIA_DEFAULT_MODELS + VISION_DEFAULT_MODELS + AUDIO_DEFAULT_MODELS:
@@ -188,10 +201,11 @@ class CatalogManager:
 
     @staticmethod
     def _estimate_param_size(repo_id: str) -> float:
-        match = re.search(r"(\d+(?:\.\d+)?)\s*[bb]", repo_id, re.IGNORECASE)
+        match = re.search(r"(\d+(?:\.\d+)?)\s*([bm])", repo_id, re.IGNORECASE)
         if match:
             try:
-                return float(match.group(1))
+                size = float(match.group(1))
+                return size / 1000 if match.group(2).lower() == "m" else size
             except ValueError:
                 pass
         return 3.0

@@ -10,17 +10,28 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 ![Hardware](https://img.shields.io/badge/hardware-Intel_NPU_%7C_Intel_Arc_%7C_CUDA_%7C_DirectML_%7C_CPU-purple.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Offline](https://img.shields.io/badge/mode-100%25_Offline_Local-orange.svg)
+![Offline](https://img.shields.io/badge/mode-Dual_Mode%3A_Google_Cloud_Run_%2B_100%25_Offline_Local-orange.svg)
+
+---
+
+## ☁️ Live Prototype on Google Cloud Run (Google Cloud AI Builder Cup 2026)
+
+AQRuntime & **AQRuntime WorkDoc** are deployed live on **Google Cloud Run** (`asia-southeast2`) with an embedded **Google Gemma 2 2B IT GGUF** model (`bartowski/gemma-2-2b-it-GGUF`) and built using **Google Antigravity**:
+
+- 📄 **Live WorkDoc Demo (Evidence-Linked Document Q&A):** [**https://aqruntime-workdoc-cvtcvsvijq-et.a.run.app/workdoc**](https://aqruntime-workdoc-cvtcvsvijq-et.a.run.app/workdoc)
+  *(Tip for Judges: Click **"📋 Load sample travel & expense policy (1-click demo)"** to test grounded Q&A with `[S1]` source citations immediately in an incognito window!)*
+- 🎛️ **Live AQRuntime Control Center:** [**https://aqruntime-workdoc-cvtcvsvijq-et.a.run.app/ui**](https://aqruntime-workdoc-cvtcvsvijq-et.a.run.app/ui)
+- 🩺 **Health Check Endpoint:** [**https://aqruntime-workdoc-cvtcvsvijq-et.a.run.app/health**](https://aqruntime-workdoc-cvtcvsvijq-et.a.run.app/health)
 
 ---
 
 ## 🌟 About Almudaya Quantum Labs & The Vision Behind AQRuntime
 
-**AQRuntime** (short for ***Almudaya Quantum Runtime***) is an open-source, lightweight, high-performance local AI runtime engineered by **Almudaya Quantum Labs**. 
+**AQRuntime** (short for ***Almudaya Quantum Runtime***) is an open-source, lightweight, high-performance AI runtime engineered by **Almudaya Quantum Labs** with a **Dual-Mode Architecture** (runs both self-contained on **Google Cloud Run** and **100% locally on personal computers**). 
 
 The word **"Quantum"** in our startup's name represents our long-term scientific vision: *to pioneer the convergence of Artificial Intelligence, Decentralized Blockchain Infrastructure, and Quantum Circuit Computing into unified next-generation runtimes*, Inshaa Allah.
 
-AQRuntime empowers users to discover, download, manage, and execute open-source Large Language Models (LLMs), Multimodal Vision Models, and Voice Speech Engines **100% locally on personal computers** without cloud dependencies, API keys, or data privacy risks.
+AQRuntime empowers users to discover, download, manage, and execute open-source Large Language Models (LLMs), Multimodal Vision Models, and Voice Speech Engines **locally on personal computers** or in **serverless Google Cloud Run containers** without external API lock-in or data privacy risks.
 
 ---
 

@@ -103,6 +103,22 @@ Displays hardware information AQRuntime can read. Compatibility estimates do not
 
 Manage Hugging Face tokens and recorded conversation sessions. A token is only needed for models that require authentication or license approval.
 
+### WorkDoc — ask questions and summarize documents
+
+WorkDoc is a separate page for asking questions about one text document and inspecting the source passages that support the answer.
+
+1. Start the app with `aq ui` and open the local address it displays (usually `http://127.0.0.1:8000/ui`).
+2. Open WorkDoc from the **WorkDoc** link in the Control Center, or visit `/workdoc` on the same host and port, for example `http://127.0.0.1:8000/workdoc`.
+3. Select an installed text model. On a resource-limited computer, choose a small model that AQRuntime can load.
+4. Choose one readable text file. WorkDoc accepts `.txt`, `.py`, `.json`, `.md`, `.log`, `.csv`, `.c`, `.cpp`, and `.h`; browser uploads are limited to 2 MB and the server uses at most 100,000 characters.
+5. Ask about a topic that appears in the document and press **Find answer**. Inspect the answer, source marker such as `[S1]`, excerpt, and character offsets before relying on it.
+6. To summarize, ask explicitly—for example, **“Summarize this document.”** The button changes to **Summarize document**. Short documents are summarized using their full text; longer documents use spaced excerpts and are labeled as representative coverage.
+7. Use **Clear** to remove the document and result from the page before starting another task.
+
+**Reading the status:** `Grounded in sources` means the answer contains a marker matching a passage supplied to the model; it does not guarantee correctness. `Insufficient evidence` means retrieval found no sufficiently matching passage. A summary displays `full document` or `representative passages` according to the coverage sent to the model.
+
+**Important limits:** WorkDoc currently accepts one text file, not PDF/DOCX/XLSX or images. Regular questions use lexical retrieval, not semantic search. Long-document summaries use sampled passages, so omitted sections may not be reflected. The document is sent to the AQRuntime server in use; avoid uploading sensitive data. WorkDoc questions are not saved to persistent chat memory.
+
 ## 4. CLI commands
 
 Run these commands from the project root with the virtual environment activated, or prefix them with `python -m aq`.

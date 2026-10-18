@@ -364,7 +364,8 @@
     </div>
 
     <div class="header-badges">
-      <span class="badge badge-status">v1.0.0</span>
+      <a href="/workdoc" class="badge" style="color: #e9d5ff; text-decoration: none; border-color: rgba(168,85,247,.5);">📄 Open WorkDoc</a>
+      <span class="badge badge-status">v2.4.0</span>
       <span class="badge" id="hw-badge">RAM Check...</span>
     </div>
   </header>
@@ -441,7 +442,7 @@
           <div class="chat-messages" id="chat-messages">
             <div class="message assistant">
               <div class="message-meta">AQRuntime Assistant</div>
-              Welcome to AQRuntime Control Center v2.4! Select an installed model, adjust max output tokens, attach files 📎/images 🖼️, speak with mic 🎙️, listen to responses 🔊, and start chatting locally.
+              Welcome to AQRuntime Workbench. Select a model to chat, or attach a text document and ask a question to get an answer grounded in matching passages with source references.
             </div>
           </div>
           <div class="typing-indicator" id="typing-indicator">Model is thinking...</div>
@@ -460,7 +461,7 @@
           <div class="chat-input-area">
             <input type="file" id="file-input" style="display: none;" onchange="handleFileSelected(event)" accept=".txt,.py,.json,.md,.log,.csv,.c,.cpp,.h">
             <input type="file" id="image-input" style="display: none;" onchange="handleImageSelected(event)" accept="image/*">
-            <button class="btn-action" style="padding: 12px 14px; font-size: 1.1rem;" title="Attach Code/Text File" onclick="document.getElementById('file-input').click()">📎</button>
+            <button class="btn-action" style="padding: 12px 14px; font-size: 1.1rem;" title="Attach a work document for source-grounded Q&A" onclick="document.getElementById('file-input').click()">📎</button>
             <button class="btn-action" style="padding: 12px 14px; font-size: 1.1rem; background: rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.4);" title="Attach Image for Vision AI" onclick="document.getElementById('image-input').click()">🖼️</button>
             <button class="btn-action" id="btn-mic" style="padding: 12px 14px; font-size: 1.1rem; background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4);" title="Record Voice with Microphone" onclick="toggleVoiceRecording()">🎙️</button>
             <textarea id="user-input" placeholder="Ask AQRuntime anything or speak with mic... (Press Enter to send)"></textarea>
@@ -714,6 +715,11 @@
     function handleFileSelected(event) {
       const file = event.target.files[0];
       if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        alert('For this prototype, attach a text file smaller than 2 MB.');
+        clearFileAttachment();
+        return;
+      }
 
       const ext = file.name.split('.').pop().toLowerCase();
       if (['docx', 'doc', 'pdf', 'zip', 'exe', 'png', 'jpg', 'jpeg', 'xlsx'].includes(ext)) {
@@ -732,13 +738,15 @@
           return;
         }
 
-        const MAX_ATTACHMENT_CHARS = 4500;
+        const MAX_ATTACHMENT_CHARS = 100000;
         if (text.length > MAX_ATTACHMENT_CHARS) {
-          text = text.substring(0, MAX_ATTACHMENT_CHARS) + `\n\n[⚠️ Catatan: Lampiran dipotong otomatis pada ${MAX_ATTACHMENT_CHARS} karakter agar aman dari batas Context Window 2048 token]`;
+          text = text.substring(0, MAX_ATTACHMENT_CHARS);
+          alert(`This document is larger than ${MAX_ATTACHMENT_CHARS.toLocaleString()} characters. Only the first ${MAX_ATTACHMENT_CHARS.toLocaleString()} characters will be analyzed.`);
         }
 
         attachedFileContent = text;
-        document.getElementById('file-attachment-name').innerText = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        document.getElementById('file-attachment-name').innerText = `${file.name} (${(file.size / 1024).toFixed(1)} KB) · WorkDoc Q&A ready`;
+        userInput.placeholder = 'Ask a question about the attached document...';
         document.getElementById('file-attachment-preview').style.display = 'block';
       };
       reader.readAsText(file);
@@ -749,6 +757,7 @@
       attachedFileName = null;
       document.getElementById('file-input').value = '';
       document.getElementById('file-attachment-preview').style.display = 'none';
+      userInput.placeholder = 'Ask AQRuntime anything or speak with mic... (Press Enter to send)';
     }
 
     function applyPersonaPreset() {
@@ -854,28 +863,70 @@
     function appendMessage(role, text, telemetry = null, imageBase64 = null) {
       const msg = document.createElement('div');
       msg.className = `message ${role}`;
-      let badgeHtml = '';
-      let ttsBtnHtml = '';
-      if (role === 'assistant') {
-        const cleanText = text.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
-        ttsBtnHtml = `<button onclick="readAloudText('${cleanText}')" style="background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); border-radius: 4px; color: #fbbf24; font-size: 0.72rem; padding: 2px 8px; cursor: pointer;" title="Read response aloud with voice">🔊 Read Aloud</button>`;
-      }
-      if (role === 'assistant' && telemetry) {
-        badgeHtml = `<div style="font-size: 0.72rem; margin-top: 8px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.08); color: var(--primary-light); display: flex; align-items: center; justify-content: space-between;"><span>⚡ ${telemetry.tokens_per_second || 0} tok/s &bull; ${telemetry.latency_seconds || 0}s latency &bull; ~2.1 GB RAM</span>${ttsBtnHtml}</div>`;
-      } else if (role === 'assistant') {
-        badgeHtml = `<div style="margin-top: 8px; display: flex; justify-content: flex-end;">${ttsBtnHtml}</div>`;
-      }
-      let imgHtml = '';
+      const meta = document.createElement('div');
+      meta.className = 'message-meta';
+      meta.textContent = role === 'user' ? 'You' : 'AQRuntime Assistant';
+      msg.appendChild(meta);
       if (imageBase64) {
-        imgHtml = `<div style="margin-bottom: 8px;"><img src="${imageBase64}" style="max-height: 160px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);"></div>`;
+        const image = document.createElement('img');
+        image.src = imageBase64;
+        image.alt = 'Attached image';
+        image.style.cssText = 'max-height:160px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);margin-bottom:8px;';
+        msg.appendChild(image);
       }
-      msg.innerHTML = `
-        <div class="message-meta">${role === 'user' ? 'You' : 'AQRuntime Assistant'}</div>
-        ${imgHtml}
-        <div>${text.replace(/\n/g, '<br>')}</div>
-        ${badgeHtml}
-      `;
+      const body = document.createElement('div');
+      body.style.whiteSpace = 'pre-wrap';
+      body.textContent = String(text || '');
+      msg.appendChild(body);
+      if (role === 'assistant') {
+        const footer = document.createElement('div');
+        footer.style.cssText = 'font-size:0.72rem;margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;gap:12px;';
+        if (telemetry) {
+          const performance = document.createElement('span');
+          performance.textContent = `⚡ ${Number(telemetry.tokens_per_second || 0)} tok/s • ${Number(telemetry.latency_seconds || 0)}s latency`;
+          footer.appendChild(performance);
+        }
+        const speak = document.createElement('button');
+        speak.textContent = '🔊 Read Aloud';
+        speak.title = 'Read response aloud with voice';
+        speak.style.cssText = 'background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);border-radius:4px;color:#fbbf24;font-size:0.72rem;padding:2px 8px;cursor:pointer;';
+        speak.addEventListener('click', () => readAloudText(String(text || '')));
+        footer.appendChild(speak);
+        msg.appendChild(footer);
+      }
       chatMessages.appendChild(msg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return msg;
+    }
+
+    function appendWorkDocSources(sources, groundingStatus) {
+      const panel = document.createElement('div');
+      panel.className = 'message assistant';
+      panel.style.cssText = 'margin-top:-10px;border-top:2px solid rgba(59,130,246,0.35);';
+      const heading = document.createElement('strong');
+      heading.textContent = groundingStatus === 'grounded' ? 'Document evidence' : 'Source check';
+      panel.appendChild(heading);
+      const status = document.createElement('div');
+      status.style.cssText = 'font-size:0.8rem;margin:6px 0 10px;color:var(--text-muted,#94a3b8);';
+      status.textContent = groundingStatus === 'grounded'
+        ? 'The model cited retrieved passages. Check the excerpts below against the original file.'
+        : groundingStatus === 'insufficient_evidence'
+          ? 'No matching passage was found, so the assistant did not answer from this document.'
+          : 'The model did not include a valid source citation. Treat its answer as unverified.';
+      panel.appendChild(status);
+      (sources || []).forEach(source => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding:8px;margin-top:6px;border-radius:6px;background:rgba(15,23,42,0.45);font-size:0.8rem;';
+        const label = document.createElement('div');
+        label.style.fontWeight = '600';
+        label.textContent = `[${source.source_id}] ${source.filename} · characters ${source.start_char}–${source.end_char}`;
+        const excerpt = document.createElement('div');
+        excerpt.style.cssText = 'margin-top:4px;white-space:pre-wrap;';
+        excerpt.textContent = source.excerpt;
+        item.append(label, excerpt);
+        panel.appendChild(item);
+      });
+      chatMessages.appendChild(panel);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
@@ -885,12 +936,20 @@
       if (!text && !attachedFileContent && !attachedImageBase64) return;
       if (!selectedModel) return;
 
-      const sendingImage = attachedImageBase64;
-      if (attachedFileContent) {
-        text = `[Attached File: ${attachedFileName}]\n\`\`\`\n${attachedFileContent}\n\`\`\`\n\n${text}`;
+      if (attachedFileContent && !text) {
+        alert('Write a question about the attached document before sending.');
+        return;
+      }
+      if (attachedFileContent && attachedImageBase64) {
+        alert('Please ask about one attachment at a time. Remove either the text document or the image first.');
+        return;
       }
 
-      appendMessage('user', text || "Jelaskan gambar ini", null, sendingImage);
+      const sendingImage = attachedImageBase64;
+      const sendingDocument = attachedFileContent;
+      const sendingFilename = attachedFileName;
+      const question = text;
+      appendMessage('user', question || (sendingDocument ? `Question about ${sendingFilename}` : 'Jelaskan gambar ini'), null, sendingImage);
       userInput.value = '';
       clearFileAttachment();
       clearImageAttachment();
@@ -906,26 +965,44 @@
       }
 
       const maxTokens = parseInt(document.getElementById('max-tokens-slider').value) || 512;
+      const customSystemPrompt = (systemPromptInput && systemPromptInput.value || '').trim();
+      const chatMessagesPayload = [];
+      if (customSystemPrompt) {
+        chatMessagesPayload.push({ role: 'system', content: customSystemPrompt });
+      }
+      chatMessagesPayload.push({ role: 'user', content: msgContentPayload });
 
       try {
-        const res = await fetch('/v1/chat/completions', {
+        const isDocumentQuestion = Boolean(sendingDocument);
+        const res = await fetch(isDocumentQuestion ? '/api/workdoc/ask' : '/v1/chat/completions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          body: JSON.stringify(isDocumentQuestion ? {
             model: selectedModel,
-            runtime: document.getElementById('runtime-select').value,
+            provider: document.getElementById('runtime-select').value,
             max_tokens: maxTokens,
-            messages: [{ role: 'user', content: msgContentPayload }]
+            filename: sendingFilename,
+            document_text: sendingDocument,
+            question: question
+          } : {
+            model: selectedModel,
+            provider: document.getElementById('runtime-select').value,
+            max_tokens: maxTokens,
+            messages: chatMessagesPayload
           })
         });
         const data = await res.json();
         typingIndicator.style.display = 'none';
         btnSend.disabled = false;
 
-        if (data.choices && data.choices[0]) {
+        if (isDocumentQuestion && data.answer) {
+          appendMessage('assistant', data.answer, data.performance);
+          appendWorkDocSources(data.sources, data.grounding_status);
+        } else if (data.choices && data.choices[0]) {
           appendMessage('assistant', data.choices[0].message.content, data.performance);
         } else if (data.error) {
-          appendMessage('assistant', `[Error]: ${data.error}`);
+          const errorText = typeof data.error === 'string' ? data.error : (data.error.message || JSON.stringify(data.error));
+          appendMessage('assistant', `[Error]: ${errorText}`);
         }
       } catch (err) {
         typingIndicator.style.display = 'none';

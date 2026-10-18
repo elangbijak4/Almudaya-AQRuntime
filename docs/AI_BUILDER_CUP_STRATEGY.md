@@ -1,182 +1,81 @@
-# Strategi Bungkus AQRuntime untuk AI Builder Cup
+# Google Cloud AI Builder Cup 2026 — AQRuntime WorkDoc Readiness
 
-Dokumen ini menjelaskan bagaimana **AQRuntime v2.4.0** dapat diadaptasi
- agar sesuai dengan persyaratan AI Builder Cup.
+## Current recommendation
 
-## Ringkasan Persyaratan Peserta
+Submit **AQRuntime WorkDoc** under **Future of Work & Enterprise Productivity**, subject to the organizer's final eligibility decision. AQRuntime is the pre-existing runtime foundation; WorkDoc is the new competition-period workflow for asking questions about a work document and reviewing retrieved source passages.
 
-Berdasarkan email undangan:
-- Memilih salah satu problem statement.
-- Tim 2–4 anggota.
-- Submission harus **functional solution**, bukan ide/slide-only.
-- Semua model AI (Gemini) atau agentic platform (Agent Platform / Antigravity / AI Studio).
-- Deploy di Google Cloud Platform via **Cloud Run** atau **Firebase**.
-- Deadline: **18 October 2026**.
+Do not present the whole AQRuntime codebase as if it were created during the hackathon. The organizer clarified that prior work may be referenced, but the evaluated solution must demonstrate substantial new development during the competition timeline.
 
-## Mapping AQRuntime ke Persyaratan
+## Eligibility and AI requirement
 
-### 1. Problem Statement yang paling cocok
-**BFSI — intelligent risk, fraud, and financial experiences**
+- The repository's initial commit is dated August 6, 2026, before the public prototype-building period. That makes the existing codebase's age a material eligibility risk.
+- The October 16 commit records substantial source changes during the competition period. Its source diff contains about 1,236 insertions and 58 deletions across runtime, inference, model loading, and API code. Git timestamps are evidence of recorded work, not independent proof of when every change was authored.
+- The WorkDoc workflow, evidence retrieval module, citation display, sample document, and Cloud Run packaging were added to this workspace on October 17. They are not yet represented in Git history because the current environment cannot write to `.git`.
+- The organizer says the final eligibility decision is made during evaluation. Preserve commit history and describe the pre-existing foundation transparently.
+- Google AI requirement has two possible routes in the official event rules: use Gemini/Gemma models or build with an approved agentic platform such as Antigravity. The project owner reports that AQRuntime was built using Google Antigravity. The prototype also uses a quantized Google Gemma model. Do not claim Gemini is integrated; it is not.
 
-Alasan:
-- AQRuntime sangat cocok untuk **privacy-first financial document analysis**.
-- Mode local-first berguna untuk data sensitif (KYC, dokumen nasabah, laporan kredit).
-- Agent loop + tool calling bisa dipakai untuk audit dokumen.
-- REST API OpenAI-compatible memudahkan integrasi.
+## Proposed challenge solution
 
-Solusi yang diajukan:
-> **AQRuntime Secure Financial Analyst** — on-device AI engine untuk analisis dokumen keuangan sensitif, dengan fallback cloud Google Gemini untuk workload kompleks dan deployment di GCP.
+**Name:** AQRuntime WorkDoc
 
-### 2. Google AI Requirement
-AQRuntime saat ini sangat berfokus pada model lokal dan belum memakai Google AI.
+**Theme:** Future of Work & Enterprise Productivity
 
-Agar memenuhi syarat, tambahkan salah satu:
-- **Gemini 2.5 Flash / 2.5 Pro** via Google AI Studio / Vertex AI
-- **Agent Platform / Antigravity / AI Studio** sebagai agentic layer
-- atau gunakan Gemini sebagai:
-  - cloud fallback
-  - summarization engine
-  - policy-compliance checker
-  - final answer verifier
+**Problem framing:** Small teams need to find specific information in work documents. A general chat box can respond without showing which part of the source supports its answer.
 
-Rekomendasi desain:
-- Model lokal AQRuntime menangani data sensitif.
-- Google Gemini menangani:
-  - analisis kompleks,
-  - summary,
-  - cross-check,
-  - export report.
+**Prototype response:** WorkDoc retrieves passages from one attached readable text file, asks the selected local model to answer from those excerpts, and displays the excerpts with source IDs and character offsets. If retrieval finds no passage, the workflow says so. If the model does not cite a retrieved source ID, the interface marks its answer as unverified.
 
-### 3. Arsitektur yang Disarankan
+**Vision:** Make AI work more inspectable and adaptable for small teams by showing where document answers came from and supporting models that run on available hardware.
 
-```text
-Client (Browser / OpenCode / API)
-        |
-        v
-AQRuntime Local Engine  ---- (offline / privacy-first)
-        |
-        |---> Local GGUF / HF models (sensitive data)
-        |
-        '---> Google Cloud Gateway (Cloud Run)
-                    |
-                    '---> Gemini API / Vertex AI
-```
+## What is implemented
 
-Mode:
-- `privacy_mode = local`: dokumen sensitif tidak keluar.
-- `cloud_mode = gemini`: fallback ke Gemini bila workload kompleks.
-- AQRuntime mengirim ringkasan anonim / context aman, bukan dokumen mentah.
+- `/workdoc` serves a separate WorkDoc interface; `/ui` remains the AQRuntime Control Center, and both pages link to each other.
+- `/api/workdoc/ask` accepts a model, question, filename, and document text.
+- Documents are divided into overlapping passages and ranked with lexical BM25-style scoring.
+- The model receives only the top passages with instructions to answer from them and cite markers such as `[S1]`.
+- The UI shows the answer, retrieved excerpts, and character offsets.
+- Answers without a recognized citation are marked unverified; missing evidence produces a refusal to answer from the document.
+- Document request text is not saved to persistent chat history. WorkDoc's warm model cache avoids reloading the model for each follow-up question; the in-memory conversation buffer is cleared after generation.
+- A synthetic sample policy is available in `docs/workdoc_demo_sample.md`.
 
-### 4. Minimum Viable Submission
+## Honest prototype limits
 
-Agar lolos submission, minimal fitur demo:
-1. Upload dokumen keuangan.
-2. Chat dengan dokumen secara lokal via AQRuntime.
-3. Ringkasan risk/fraud risk dari dokumen.
-4. Satu call ke Google Gemini untuk:
-   - executive summary,
-   - compliance checklist,
-   - risk scoring explanation.
-5. Deploy gateway ke Cloud Run.
-6. Dokumen (README, demo video, deployment URL).
+- One text/code file at a time; supported extensions are `.txt`, `.py`, `.json`, `.md`, `.log`, `.csv`, `.c`, `.cpp`, and `.h`.
+- Browser upload is capped at 2 MB; the API caps document text at 100,000 characters and questions at 2,000 characters.
+- Retrieval uses lexical terms, not semantic embeddings. A citation marker only confirms that the answer referenced a retrieved passage; it does not guarantee correctness.
+- PDF/DOCX/XLSX extraction, multi-document search, OCR, real speech transcription, and real vision inference are outside the WorkDoc workflow.
+- Do not claim that document contents remain on the user's device when the Cloud Run version is used. Cloud Run receives the request and performs inference in Google Cloud.
 
-### 5. Mapping Fitur Existing AQRuntime ke Submission
+## Cloud Run readiness
 
-| Fitur AQRuntime | Nilai untuk hackathon |
-|---|---|
-| Local LLM chat | Privacy-first financial analysis |
-| Streaming SSE | Fast analyst response |
-| Document attachment | Dokumen kredit / laporan |
-| Generic tool calling | Audit workflow / ekstraksi field |
-| OpenAI-compatible API | Integrasi enterprise mudah |
-| Web Control Center | Demo tanpa terminal |
-| Warm cache | Inference berulang stabil |
+- `Dockerfile` builds a Linux CPU image, installs `llama-cpp-python`, and downloads the Gemma 2 2B Q4_K_M model at build time.
+- The model file is approximately 1.71 GB. It is excluded from Git and fetched from the public model repository during the image build.
+- `.dockerignore` removes local models, Python environments, logs, scratch files, and PoC archives from the build context.
+- `.gitignore` now explicitly includes `src/aqruntime/memory` (application source) while retaining the root `memory/` ignore for runtime conversation data. This package was previously hidden by the broad ignore rule and must be present in a deployment source checkout.
+- `cloudbuild.yaml` builds and pushes the image to Artifact Registry in `asia-southeast2`; it does not deploy a Cloud Run service.
+- The Cloud Run command binds to `0.0.0.0` and reads the platform's `PORT` value.
+- Suggested initial service settings: `asia-southeast2`, 4 vCPU, 8 GiB RAM, concurrency 1, maximum instances 1. Keep minimum instances at zero during rehearsals; deciding to keep one instance warm during evaluation may add idle cost.
+- Build, Artifact Registry storage, and inference can incur charges. A billing budget alert is a notification, not a hard spending limit.
+- Docker and `gcloud` are unavailable in the current development environment. No image build or Cloud Run deployment has been completed.
 
-### 6. GAP Saat Ini vs Persyaratan Hackathon
+## Submission status
 
-| Persyaratan | Status AQRuntime |
-|---|---|
-| Google AI / agentic platform | Belum ada |
-| Deploy Cloud Run/Firebase | Belum ada |
-| Submission functional | Sebagian (lokal) |
-| Tim 2–4 | TBD |
-| Problem statement | Perlu pilih (disarankan BFSI) |
-| Credits / mentorship | Didukung panitia |
+| Requirement | Status |
+| --- | --- |
+| One selected theme | Proposed: Future of Work & Enterprise Productivity |
+| Substantial new development | WorkDoc source implementation added; must be reviewed and demonstrated |
+| Google AI / agentic platform | Antigravity development reported by owner; Gemma GGUF model selected |
+| Cloud Run or Firebase live deployment | Not deployed; Cloud Build packaging prepared |
+| Public GitHub repository | Existing project repo is public; new changes are local and not pushed yet |
+| Pitch deck in prescribed template | Not completed; obtain template from submission dashboard |
+| 3–4 minute demo video | Not recorded; organizer confirmed the updated email duration |
+| Brief solution description | Can be based on the solution summary above |
 
-### 7. Langkah Implementasi yang Disarankan
+## Demo plan
 
-#### Minggu 1
-- Pilih BFSI
-- Form tim 2–4
-- Jawab use case: "Private financial document analyst"
-
-#### Minggu 2
-- Tambah Gemini integration:
-  - env `GEMINI_API_KEY`
-  - provider `cloud_gemini`
-  - endpoint `/api/gemini/executive-summary`
-- Buat report dari hasil chat lokal
-- Buat package deploy
-
-#### Minggu 3
-- Deploy Cloud Run
-- Uji demo
-- Rekam video submission
-- Lengkapi dokumentasi
-
-### 8. Deployment Plan (Cloud Run)
-
-```dockerfile
-FROM python:3.12-slim
-WORKDIR /app
-COPY . /app
-RUN pip install --no-cache-dir -r requirements.txt
-CMD python -m aq serve --host 0.0.0.0 --port 8080
-```
-
-Commands cloud:
-```bash
-gcloud builds submit --tag gcr.io/PROJECT_ID/aqruntime-cup
-gcloud run deploy aqruntime-cup \
-  --image gcr.io/PROJECT_ID/aqruntime-cup \
-  --platform managed \
-  --region asia-southeast1 \
-  --allow-unauthenticated \
-  --set-env-vars GEMINI_API_KEY=YOUR_KEY
-```
-
-Catatan:
-- Cloud Run memakai port 8080.
-- Firebase opsional, tetapi Cloud Run lebih cocok.
-- Local model bisa tetap dieksekusi di demo laptop via AQRuntime.
-
-### 9. Perbaikan Fitur Agar "Benar-benar sesuai klaim"
-
-Sebelum submit, pastikan:
-- Klaim STT disebut "simulated/local endpoint" bila Whisper actual belum diimplementasi.
-- Klaim Vision disebut "experimental simulated".
-- Telemetry disebut "estimated throughput".
-- GCP + Google AI integration aktif.
-- Demo tidak menyatakan model cloud jika tidak dipakai.
-
-### 10. Roadmap AI Builder Cup
-
-- **Hari 1-2**: pilih domain BFSI, bentuk tim
-- **Hari 3-5**: integrasi Gemini + demo workflow
-- **Hari 6-7**: deploy Cloud Run
-- **Hari 8**: video demo + README + arsitektur
-- **Deadline Oct 18, 2026**: submit final
-
-### 11. Kesimpulan
-
-AQRuntime bisa menjadi backbone submission:
-- privacy-first local AI,
-- telemetri dan stream,
-- attachment reader,
-- proxy/gateway GCP,
-- optional OpenCode integration for developer workflow.
-
-Agar sesuai hackathon, kunci utamanya:
-- gunakan Google AI (Gemini) secara nyata,
-- deploy di Google Cloud,
-- presentasikan jujur mana fitur siap dan mana roadmap.
+1. State that AQRuntime is the prior runtime foundation and WorkDoc is the new competition-period workflow.
+2. Attach the synthetic sample policy.
+3. Ask: “What approval is required for a trip estimated to cost USD 1,800?”
+4. Show the answer with its source marker and excerpt containing the USD 1,500 threshold.
+5. Ask: “What is the reimbursement limit for international roaming?”
+6. Show that no matching passage was found and that the assistant does not invent a policy answer.
+7. Repeat the same workflow on the live Cloud Run URL after deployment is verified.

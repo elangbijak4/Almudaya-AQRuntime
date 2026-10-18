@@ -158,6 +158,23 @@ class InferenceEngine:
             normalized.insert(0, {"role": "system", "content": self.active_system_prompt})
         return normalized
 
+    def _prepare_conversation_messages(self, messages: list[dict]) -> list[dict]:
+        """Normalize messages and merge persistent session history when caller sends a single turn."""
+        normalized = self._normalize_messages(messages)
+        if not (self.persistent and self.memory_manager and self.session_name):
+            return normalized
+
+        non_system = [m for m in normalized if m["role"] != "system"]
+        if len(non_system) == 1 and non_system[0]["role"] == "user":
+            history = self.memory_manager.load_session(self.session_name)
+            if history:
+                system_msgs = [m for m in normalized if m["role"] == "system"]
+                from aqruntime.memory import MemoryManager
+
+                merged = [*system_msgs, *history, non_system[0]]
+                return MemoryManager.apply_short_term_window(merged)
+        return normalized
+
     def format_messages(self, messages: list[dict]) -> str:
         """Format normalized OpenAI-style messages using the model's chat template."""
         normalized = self._normalize_messages(messages)
@@ -175,7 +192,7 @@ class InferenceEngine:
         except (TypeError, ValueError):
             max_tokens = 512
         try:
-            normalized = self._normalize_messages(messages)
+            normalized = self._prepare_conversation_messages(messages)
             if not any(message["role"] == "user" for message in normalized):
                 raise ValueError("No user message found in 'messages'.")
 
@@ -230,7 +247,7 @@ class InferenceEngine:
         except (TypeError, ValueError):
             max_tokens = 512
 
-        normalized = self._normalize_messages(messages)
+        normalized = self._prepare_conversation_messages(messages)
         if not any(message["role"] == "user" for message in normalized):
             raise ValueError("No user message found in 'messages'.")
 
@@ -474,7 +491,7 @@ class InferenceEngine:
         import time
 
         normalized_tools = self._normalize_tools(tools)
-        normalized_messages = self._normalize_messages(messages)
+        normalized_messages = self._prepare_conversation_messages(messages)
         if not normalized_tools:
             normalized_messages_without_default = normalized_messages
             response = self.generate_messages(normalized_messages_without_default, max_tokens=max_tokens)

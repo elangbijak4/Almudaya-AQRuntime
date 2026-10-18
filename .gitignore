@@ -38,6 +38,8 @@ share/python-wheels/
 # 3. Logs, Memory Sessions & Caches
 logs/
 memory/
+!/src/aqruntime/memory/
+!/src/aqruntime/memory/**
 memory_*_export.md
 config/catalog_cache.json
 *.log
@@ -49,3 +51,9 @@ config/catalog_cache.json
 *.swo
 .DS_Store
 Thumbs.db
+
+# 5. Local Scratch Archives & Temporary Deployment Bundles
+scratch/
+aqruntime_cloudrun_deploy.zip
+requirements_before_llamacpp.lock
+release/

@@ -103,6 +103,22 @@ Menampilkan informasi perangkat yang dapat dibaca aplikasi. Perkiraan kompatibil
 
 > Mengelola token Hugging Face dan sesi memori. Token hanya diperlukan untuk model yang meminta autentikasi atau persetujuan lisensi.
 
+### WorkDoc — tanya dan rangkum dokumen
+
+WorkDoc adalah halaman terpisah untuk bertanya tentang satu dokumen teks sambil memeriksa cuplikan sumber yang mendukung jawaban.
+
+1. Jalankan aplikasi dengan `aq ui` dan buka alamat lokal yang ditampilkan (umumnya `http://127.0.0.1:8000/ui`).
+2. Buka halaman WorkDoc dari tautan **WorkDoc** di Control Center, atau kunjungi `/workdoc` pada host dan port yang sama, misalnya `http://127.0.0.1:8000/workdoc`.
+3. Pilih model teks yang sudah terpasang. Untuk komputer dengan sumber daya terbatas, gunakan model kecil yang memang bisa dimuat oleh AQRuntime.
+4. Pilih satu file teks yang dapat dibaca. WorkDoc menerima `.txt`, `.py`, `.json`, `.md`, `.log`, `.csv`, `.c`, `.cpp`, dan `.h`; batas unggah di browser 2 MB dan isi yang dipakai maksimal 100.000 karakter.
+5. Ketik pertanyaan tentang topik yang benar-benar disebutkan dalam dokumen lalu tekan **Find answer**. Periksa jawaban, marker sumber seperti `[S1]`, cuplikan, dan posisi karakter sebelum mengandalkannya.
+6. Untuk merangkum, minta secara eksplisit, misalnya **“Apakah anda bisa merangkum dokumen ini?”** atau **“Summarize this document.”** Tombol berubah menjadi **Summarize document**. Dokumen pendek diringkas dengan seluruh isinya; dokumen lebih panjang menggunakan cuplikan tersebar dan statusnya menyatakan bahwa cakupannya representatif.
+7. Gunakan **Clear** untuk menghapus dokumen dan hasil dari halaman sebelum memulai pekerjaan berikutnya.
+
+**Membaca status:** `Grounded in sources` berarti jawaban memuat marker yang cocok dengan cuplikan yang diberikan ke model; ini bukan jaminan bahwa jawabannya benar. `Insufficient evidence` berarti pencarian tidak menemukan bagian yang cukup cocok. Ringkasan menampilkan `full document` atau `representative passages` sesuai cakupan yang dikirim ke model.
+
+**Batas penting:** WorkDoc saat ini menerima satu file teks, bukan PDF/DOCX/XLSX atau gambar. Pertanyaan biasa menggunakan pencarian leksikal, bukan semantic search. Ringkasan dokumen panjang dibuat dari sampel cuplikan, jadi bagian yang tidak terambil bisa terlewat. Dokumen dikirim ke server AQRuntime yang sedang digunakan; hindari mengunggah data sensitif. Pertanyaan WorkDoc tidak disimpan ke memori chat persisten.
+
 ## 4. Perintah CLI
 
 Jalankan dari akar proyek dengan virtualenv aktif, atau awali perintah dengan `python -m aq`.

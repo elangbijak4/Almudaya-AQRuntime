@@ -119,3 +119,55 @@ def chat(model_name: str, messages: list[dict], max_tokens: int = 512, timeout: 
         "provider": "gemini-cloud",
     }
     return text, telemetry
+
+
+class GeminiTokenizerAdapter:
+    """Lightweight tokenizer wrapper for Gemini cloud models."""
+
+    def __init__(self, model_name: str) -> None:
+        self.model_name = model_name
+        self.eos_token_id = 2
+        self.chat_template = "gemini"
+        self.is_gguf = True
+
+    def encode(self, text: str, **kwargs) -> list[int]:
+        if not text:
+            return []
+        return [1] * max(1, len(text.split()))
+
+    def apply_chat_template(self, messages: list[dict], tokenize: bool = False, add_generation_prompt: bool = True) -> str:
+        role_map = {"system": "System", "user": "User", "assistant": "Assistant", "tool": "Tool"}
+        parts = [f"{role_map.get(m.get('role', 'user'), 'User')}: {m.get('content', '')}" for m in messages]
+        return "\n\n".join(parts) + "\n\nAssistant:"
+
+
+class GeminiModelAdapter:
+    """Adapter allowing InferenceEngine to execute Gemini API calls identically to local models."""
+
+    def __init__(self, model_name: str) -> None:
+        self.model_name = model_name
+        self.is_gguf = True
+        self.generation_config = type("Config", (), {"eos_token_id": 2})()
+
+    def eval(self) -> None:
+        pass
+
+    def generate_text(self, formatted_prompt: str, max_tokens: int = 512) -> str:
+        text, _ = chat(
+            self.model_name,
+            [{"role": "user", "content": formatted_prompt}],
+            max_tokens=max_tokens,
+        )
+        return text.strip()
+
+    def generate_text_stream(self, formatted_prompt: str, max_tokens: int = 512):
+        text = self.generate_text(formatted_prompt, max_tokens=max_tokens)
+        if text:
+            yield text
+
+
+def load_gemini_adapter(model_name: str) -> tuple[GeminiTokenizerAdapter, GeminiModelAdapter]:
+    if not is_configured():
+        raise RuntimeError("GEMINI_API_KEY is not configured.")
+    return GeminiTokenizerAdapter(model_name), GeminiModelAdapter(model_name)
+

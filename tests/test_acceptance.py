@@ -184,6 +184,9 @@ class ServerTests(unittest.TestCase):
         handler.do_GET()
         handler._send_json.assert_called()
         self.assertEqual(handler._send_json.call_args[0][0], 200)
+        self.assertIn("cpu", handler._send_json.call_args[0][1]["hardware"])
+        self.assertIn("max_safe_param_b", handler._send_json.call_args[0][1]["hardware"])
+        self.assertIn("max_safe_gguf_param_b", handler._send_json.call_args[0][1]["hardware"])
 
         handler.path = "/api/discover"
         handler._send_json = MagicMock()
@@ -202,6 +205,13 @@ class ServerTests(unittest.TestCase):
         handler.do_GET()
         handler._send_html.assert_called()
         self.assertEqual(handler._send_html.call_args[0][0], 200)
+
+        handler.path = "/workdoc"
+        handler._send_html = MagicMock()
+        handler.do_GET()
+        handler._send_html.assert_called_once()
+        self.assertEqual(handler._send_html.call_args[0][0], 200)
+        self.assertIn("AQRuntime WorkDoc", handler._send_html.call_args[0][1])
 
 
 class MemoryTests(unittest.TestCase):
@@ -248,6 +258,31 @@ class MemoryTests(unittest.TestCase):
 
 
 class HardwareAndCatalogTests(unittest.TestCase):
+    def test_catalog_estimates_million_parameter_models(self) -> None:
+        self.assertEqual(CatalogManager._estimate_param_size("facebook/opt-125m"), 0.125)
+        self.assertEqual(CatalogManager._estimate_param_size("Qwen/Qwen3-0.6B"), 0.6)
+
+    def test_catalog_refreshes_stale_cached_million_estimate(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            cache = root / "config" / "catalog_cache.json"
+            cache.parent.mkdir(parents=True)
+            cache.write_text(
+                json.dumps([{
+                    "repo_id": "facebook/opt-125m",
+                    "name": "opt-125m",
+                    "param_size_b": 3.0,
+                    "est_ram_gb": 6.6,
+                    "is_gated": False,
+                    "description": "Hugging Face model (facebook/opt-125m).",
+                }]),
+                encoding="utf-8",
+            )
+            models = CatalogManager(root).load_cached_catalog()
+            model = next(item for item in models if item["repo_id"] == "facebook/opt-125m")
+            self.assertEqual(model["param_size_b"], 0.125)
+            self.assertEqual(model["est_ram_gb"], 0.3)
+
     def test_hardware_detector(self) -> None:
         detector = HardwareDetector()
         summary = detector.get_summary()
@@ -365,6 +400,60 @@ class ChatTemplateTests(unittest.TestCase):
         self.assertEqual(tokenizer.options, (False, True))
 
 
+class WorkDocTests(unittest.TestCase):
+    def test_summary_request_detects_indonesian_and_english(self) -> None:
+        from aqruntime.workdoc import is_summary_request
+
+        self.assertTrue(is_summary_request("Apakah anda bisa merangkum dokumen ini"))
+        self.assertTrue(is_summary_request("Summarize this document"))
+        self.assertFalse(is_summary_request("What is the project purpose?"))
+
+    def test_summary_retrieval_covers_short_build_specification(self) -> None:
+        from pathlib import Path
+        from aqruntime.workdoc import retrieve_summary_evidence
+
+        document = (Path(__file__).resolve().parents[1] / "AI_BUILD_SPECIFICATION.md.txt").read_text(encoding="utf-8")
+        sources, total = retrieve_summary_evidence(document, "AI_BUILD_SPECIFICATION.md.txt")
+        self.assertEqual(total, len(sources))
+        self.assertEqual(sources[0]["start_char"], 0)
+        self.assertEqual(sources[-1]["end_char"], len(document.rstrip()))
+
+    def test_long_summary_retrieval_is_evenly_sampled(self) -> None:
+        from aqruntime.workdoc import MAX_SUMMARY_CHUNKS, retrieve_summary_evidence
+
+        document = ("This is a paragraph about the project.\n" * 500)
+        sources, total = retrieve_summary_evidence(document, "long.txt")
+        self.assertGreater(total, MAX_SUMMARY_CHUNKS)
+        self.assertLessEqual(len(sources), MAX_SUMMARY_CHUNKS)
+        self.assertEqual(sources[0]["start_char"], 0)
+        self.assertGreater(sources[-1]["end_char"], len(document) - 1000)
+
+    def test_retrieval_rejects_shared_generic_terms_without_topic_match(self) -> None:
+        from aqruntime.workdoc import retrieve_evidence
+
+        document = "Meal reimbursement is capped at USD 60 per person per day."
+        self.assertEqual(
+            retrieve_evidence(document, "What is the international roaming reimbursement limit?", "sample.txt"),
+            [],
+        )
+
+    def test_retrieval_keeps_matching_specific_topic(self) -> None:
+        from aqruntime.workdoc import retrieve_evidence
+
+        document = "Meal reimbursement is capped at USD 60 per person per day."
+        sources = retrieve_evidence(document, "What is the meal reimbursement limit?", "sample.txt")
+        self.assertEqual(len(sources), 1)
+        self.assertEqual(sources[0]["source_id"], "S1")
+
+    def test_workdoc_sample_loader(self) -> None:
+        from aqruntime.workdoc import load_sample_document
+
+        sample = load_sample_document()
+        self.assertEqual(sample["filename"], "workdoc_demo_sample.md")
+        self.assertIn("Northstar Studio", sample["document_text"])
+        self.assertGreater(len(sample["sample_questions"]), 0)
+
+
 class ProviderManagerTests(unittest.TestCase):
     def test_provider_manager_list(self) -> None:
         mgr = ProviderManager()
@@ -402,6 +491,57 @@ class ProviderManagerTests(unittest.TestCase):
         self.assertIn("total_seconds", telemetry)
         self.assertGreater(telemetry["tokens_per_second"], 0)
 
+    def test_single_turn_requests_preserve_persistent_memory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            mem = MemoryManager(Path(tmpdir))
+            model = SimulatedGGUFModel(Path("test_model.gguf"))
+            engine1 = InferenceEngine(model, model, memory_manager=mem, session_name="chat_s", persistent=True)
+            engine1.generate_messages([{"role": "user", "content": "My name is Aslan."}])
+
+            engine2 = InferenceEngine(model, model, memory_manager=mem, session_name="chat_s", persistent=True)
+            engine2.generate_messages([{"role": "user", "content": "What is my name?"}])
+
+            saved = mem.load_session("chat_s")
+            self.assertEqual(len(saved), 4)
+            self.assertEqual(saved[0]["content"], "My name is Aslan.")
+            self.assertEqual(saved[2]["content"], "What is my name?")
+
+    def test_warm_cache_shared_between_chat_and_workdoc(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            settings = RuntimeSettings("2.4.0", None, root / "models", root / "logs", None, root, max_cached_models=1)
+            (root / "models" / "test-model").mkdir(parents=True)
+            rt = RuntimeCore(settings=settings)
+            try:
+                fake_tok = SimulatedGGUFModel(Path("test.gguf"))
+                fake_mod = SimulatedGGUFModel(Path("test.gguf"))
+                with patch.object(rt.providers.providers["cpu"], "load_model", return_value=(fake_tok, fake_mod)) as mock_load:
+                    eng_chat = rt.load_inference("test-model", persistent=True, provider="cpu")
+                    eng_workdoc = rt.load_inference("test-model", persistent=False, provider="cpu", cache_model=True)
+                    self.assertEqual(mock_load.call_count, 1)
+                    self.assertIs(eng_chat.model, eng_workdoc.model)
+                    self.assertTrue(eng_chat.persistent)
+                    self.assertFalse(eng_workdoc.persistent)
+            finally:
+                rt.shutdown()
+
+    def test_gemini_cloud_model_integration_when_configured(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            settings = RuntimeSettings("2.4.0", None, root / "models", root / "logs", None, root)
+            rt = RuntimeCore(settings=settings)
+            try:
+                with patch.dict("os.environ", {"GEMINI_API_KEY": "test_key_abc"}):
+                    chat_models = rt.list_chat_models()
+                    self.assertIn("gemini-2.5-flash", chat_models)
+                    with patch("aqruntime.providers.gemini.chat", return_value=("Grounded answer [S1]", {"tokens_per_second": 40.0})):
+                        engine = rt.load_inference("gemini-2.5-flash", persistent=False)
+                        ans = engine.generate_messages([{"role": "user", "content": "Test question"}])
+                        self.assertEqual(ans, "Grounded answer [S1]")
+            finally:
+                rt.shutdown()
+
 
 if __name__ == "__main__":
     unittest.main()
+

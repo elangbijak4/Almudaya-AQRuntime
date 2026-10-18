@@ -1,0 +1,27 @@
+.git
+.venv
+.venv_broken_315
+__pycache__
+**/__pycache__
+*.py[cod]
+models
+logs
+memory
+!src/aqruntime/memory/
+!src/aqruntime/memory/**
+scratch
+build
+release
+image
+tests
+docs
+!docs/workdoc_demo_sample.md
+AQRuntime PoC v*
+ct_*.py
+direct_gemma.py
+dll_test.py
+gguf_info.py
+info_cpu.py
+out_*.txt
+memory_*_export.md
+requirements_before_llamacpp.lock

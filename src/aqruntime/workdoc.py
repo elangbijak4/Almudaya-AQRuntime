@@ -152,6 +152,131 @@ def retrieve_evidence(document: str, question: str, filename: str, limit: int = 
     return results
 
 
+_BILINGUAL_SYNONYMS: dict[str, set[str]] = {
+    "biaya": {"cost", "expense", "rate", "price", "usd"},
+    "ongkos": {"cost", "expense", "travel"},
+    "harga": {"cost", "rate", "price"},
+    "persetujuan": {"approval", "approve", "approved", "written", "manager", "director"},
+    "izin": {"approval", "approve", "allowed", "written"},
+    "atasan": {"manager", "director", "department"},
+    "manajer": {"manager", "approval"},
+    "direktur": {"director", "department"},
+    "makan": {"meal", "meals", "reimbursement", "day"},
+    "makanan": {"meal", "meals", "reimbursement"},
+    "konsumsi": {"meal", "meals", "alcohol"},
+    "alkohol": {"alcohol", "reimbursable"},
+    "pesawat": {"flight", "flights", "economy", "cabin", "booking", "departure"},
+    "penerbangan": {"flight", "flights", "economy", "cabin", "departure"},
+    "tiket": {"booking", "book", "flight", "reservations"},
+    "hotel": {"hotel", "hotels", "rate", "destination"},
+    "penginapan": {"hotel", "hotels", "rate"},
+    "batal": {"cancel", "cancellation", "changes", "reservations"},
+    "pembatalan": {"cancel", "cancellation", "fee", "explanation"},
+    "ubah": {"change", "changes", "reservations"},
+    "perubahan": {"change", "changes", "business"},
+    "klaim": {"reimbursement", "expense", "report", "receipt", "receipts", "submit"},
+    "ganti": {"reimbursement", "reimbursable", "expense"},
+    "kuitansi": {"receipt", "receipts", "expense"},
+    "struk": {"receipt", "receipts", "expense"},
+    "laporan": {"report", "submit", "calendar", "days"},
+    "perjalanan": {"trip", "trips", "travel", "travelers", "business"},
+    "dinas": {"business", "trip", "travel"},
+    "liburan": {"personal", "extensions", "travel"},
+    "pribadi": {"personal", "extensions"},
+}
+
+
+def _expand_query_terms(terms: set[str]) -> set[str]:
+    expanded = set(terms)
+    for term in list(terms):
+        if term in _BILINGUAL_SYNONYMS:
+            expanded.update(_BILINGUAL_SYNONYMS[term])
+        singular = _singular(term)
+        if singular in _BILINGUAL_SYNONYMS:
+            expanded.update(_BILINGUAL_SYNONYMS[singular])
+    return expanded
+
+
+def retrieve_interactive_evidence(
+    document: str,
+    question: str,
+    filename: str,
+    history: list[dict] | None = None,
+    limit: int = MAX_EVIDENCE_CHUNKS,
+) -> tuple[list[dict], str, int]:
+    """Retrieve passages for interactive document discussion with bilingual & contextual fallback.
+
+    Returns (sources, retrieval_mode, total_chunks) where retrieval_mode is one of:
+    - 'summary': explicit summary request
+    - 'grounded_qa': direct or bilingual lexical match found
+    - 'discussion': open-ended discussion or full-context fallback
+    """
+    if is_summary_request(question):
+        sources, total = retrieve_summary_evidence(document, filename)
+        return sources, "summary", total
+
+    # 1. Try strict lexical match on the current question first
+    direct = retrieve_evidence(document, question, filename, limit=limit)
+    chunks = _split_chunks(document)
+    total_chunks = len(chunks)
+    if direct:
+        return direct, "grounded_qa", total_chunks
+
+    # 2. Try bilingual synonym expansion + recent conversation context
+    combined_query = question
+    if history:
+        recent_user_turns = [
+            str(item.get("content", ""))
+            for item in history[-4:]
+            if isinstance(item, dict) and item.get("role") == "user"
+        ]
+        if recent_user_turns:
+            combined_query = " ".join(recent_user_turns[-2:] + [question])
+
+    expanded_terms = _expand_query_terms(set(_tokens(combined_query)))
+    if chunks and expanded_terms:
+        tokenized = [_tokens(chunk[2]) for chunk in chunks]
+        doc_freq: dict[str, int] = {}
+        for terms in tokenized:
+            for term in set(terms):
+                doc_freq[term] = doc_freq.get(term, 0) + 1
+        scored: list[tuple[float, int]] = []
+        average_length = max(1.0, sum(map(len, tokenized)) / len(tokenized))
+        for index, terms in enumerate(tokenized):
+            normalized_terms = {_singular(term) for term in terms} | set(terms)
+            frequencies: dict[str, int] = {}
+            for term in terms:
+                frequencies[term] = frequencies.get(term, 0) + 1
+                frequencies[_singular(term)] = frequencies.get(_singular(term), 0) + 1
+            score = 0.0
+            matched_specific = 0
+            for term in expanded_terms:
+                frequency = frequencies.get(term, 0)
+                if not frequency:
+                    continue
+                if term not in _GENERIC_DOCUMENT_TERMS:
+                    matched_specific += 1
+                df = doc_freq.get(term, 1)
+                inverse_document_frequency = math.log(1 + (len(chunks) - df + 0.5) / (df + 0.5))
+                denominator = frequency + 1.2 * (0.25 + 0.75 * len(terms) / average_length)
+                score += inverse_document_frequency * frequency * 2.2 / denominator
+            if score > 0 and matched_specific > 0:
+                scored.append((score, index))
+        if scored:
+            selected = sorted(scored, reverse=True)[: max(1, min(limit, MAX_EVIDENCE_CHUNKS))]
+            selected.sort(key=lambda item: item[1])
+            results = [
+                EvidenceChunk(f"S{rank}", chunks[idx][0], chunks[idx][1], chunks[idx][2], sc).to_dict(filename)
+                for rank, (sc, idx) in enumerate(selected, start=1)
+            ]
+            return results, "grounded_qa", total_chunks
+
+    # 3. Fallback: provide representative document passages so the AI model can
+    # hold an intelligent discussion or explain what the document actually covers.
+    fallback_sources, total = retrieve_summary_evidence(document, filename, limit=min(limit, MAX_EVIDENCE_CHUNKS))
+    return fallback_sources, "discussion", total
+
+
 def cited_source_ids(answer: str, sources: list[dict]) -> list[str]:
     """Keep only citation IDs actually present in the retrieved evidence."""
     available = {source["source_id"] for source in sources}

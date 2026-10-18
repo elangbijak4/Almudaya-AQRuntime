@@ -453,6 +453,32 @@ class WorkDocTests(unittest.TestCase):
         self.assertIn("Northstar Studio", sample["document_text"])
         self.assertGreater(len(sample["sample_questions"]), 0)
 
+    def test_interactive_bilingual_and_discussion_retrieval(self) -> None:
+        from aqruntime.workdoc import load_sample_document, retrieve_interactive_evidence
+
+        sample = load_sample_document()
+        doc = sample["document_text"]
+
+        # Indonesian query about meal limit matches English 'meal reimbursement' chunk
+        sources_id, mode_id, _ = retrieve_interactive_evidence(
+            doc,
+            "Berapa batas klaim biaya makan per hari?",
+            sample["filename"],
+        )
+        self.assertEqual(mode_id, "grounded_qa")
+        self.assertGreater(len(sources_id), 0)
+        self.assertIn("USD 60", sources_id[0]["excerpt"])
+
+        # Open-ended discussion falls back to representative passages instead of empty list
+        sources_disc, mode_disc, _ = retrieve_interactive_evidence(
+            doc,
+            "Bagaimana pendapatmu tentang kebijakan perusahaan ini secara umum?",
+            sample["filename"],
+        )
+        self.assertEqual(mode_disc, "discussion")
+        self.assertGreater(len(sources_disc), 0)
+
+
 
 class ProviderManagerTests(unittest.TestCase):
     def test_provider_manager_list(self) -> None:

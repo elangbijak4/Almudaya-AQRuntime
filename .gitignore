@@ -40,6 +40,7 @@ logs/
 memory/
 !/src/aqruntime/memory/
 !/src/aqruntime/memory/**
+/src/aqruntime/memory/__pycache__/
 memory_*_export.md
 config/catalog_cache.json
 *.log

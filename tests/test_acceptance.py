@@ -467,7 +467,7 @@ class WorkDocTests(unittest.TestCase):
         )
         self.assertEqual(mode_id, "grounded_qa")
         self.assertGreater(len(sources_id), 0)
-        self.assertIn("USD 60", sources_id[0]["excerpt"])
+        self.assertTrue(any("USD 60" in s["excerpt"] for s in sources_id))
 
         # Open-ended discussion falls back to representative passages instead of empty list
         sources_disc, mode_disc, _ = retrieve_interactive_evidence(

@@ -6,6 +6,7 @@ import json
 from email.parser import BytesParser
 from email.policy import default as default_email_policy
 from pathlib import Path
+import os
 import time
 import urllib.parse
 import webbrowser

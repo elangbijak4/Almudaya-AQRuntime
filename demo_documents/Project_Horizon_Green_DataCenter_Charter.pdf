@@ -1,0 +1,59 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 1653 >>
+stream
+BT
+/F1 11 Tf
+50 750 Td
+16 TL
+(Project Horizon - Green Edge AI Data Center Charter \(2026\)) Tj T*
+(Document Code: PRJ-HORIZON-2026 | Location: Bandung, Indonesia | Lead SRE: Dr. Hendra Wijaya) Tj T*
+() Tj T*
+(1. Executive Summary & Cooling Target) Tj T*
+(Project Horizon establishes a 5 MW solar-assisted Edge AI data center in Bandung.) Tj T*
+(By deploying two-phase liquid immersion cooling, the facility reduces cooling power) Tj T*
+(consumption by 35% compared to traditional air-cooled server rooms.) Tj T*
+() Tj T*
+(2. Budget Allocation & Project Phases) Tj T*
+(The total approved capital budget is USD 4,200,000 divided into three phases:) Tj T*
+(- Phase 1 \(Site Preparation & Solar Microgrid\): USD 1,100,000 completing in Q2 2026.) Tj T*
+(- Phase 2 \(Server Racks & AI Accelerator Deployment\): USD 2,400,000 completing in Q3 2026.) Tj T*
+(- Phase 3 \(Commissioning, Penetration Testing & Safety Audit\): USD 700,000 completing in Q4 2026.) Tj T*
+(Any budget variance exceeding 10% requires written sign-off from the Investment Committee.) Tj T*
+() Tj T*
+(3. Reliability, Thermal Thresholds & Escalation) Tj T*
+(The facility targets a minimum service availability of 99.95% annual uptime.) Tj T*
+(If liquid coolant temperature exceeds 42 degrees Celsius, automated workload throttling) Tj T*
+(activates within 30 seconds and pages Lead SRE Dr. Hendra Wijaya immediately.) Tj T*
+() Tj T*
+(4. Battery Backup & Environmental Compliance) Tj T*
+(Lithium Iron Phosphate \(LFP\) battery banks provide 18 hours of reserve power at full load.) Tj T*
+(All decommissioned hardware and e-waste must be processed by ISO-14001 certified recyclers.) Tj T*
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2016
+%%EOF
